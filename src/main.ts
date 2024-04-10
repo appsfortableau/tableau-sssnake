@@ -4,10 +4,10 @@ import "./style.css";
 type GameSize = [number, number];
 
 enum Direction {
-	UP,
-	DOWN,
-	LEFT,
-	RIGHT,
+	UP, // 0
+	DOWN, // 1
+	LEFT, // 2
+	RIGHT, // 3
 }
 
 class Game {
@@ -26,26 +26,57 @@ class Game {
 
 	dir: Direction = Direction.UP;
 
+	speed: number = 500;
+
 	constructor(engine: Renderer) {
 		this.engine = engine;
 		this.snake = new Snake(2, 5, 4);
 		this.food = [new Food(this.size[0] * 0.6, this.size[1] * 0.5)];
 
 		this.engine.init(this);
+		this.keymaps();
+	}
+
+	keymaps() {
+		window.addEventListener("keyup", (e: KeyboardEvent) => {
+			if (e.key === " ") {
+				this.speed = 500;
+				return;
+			}
+
+			if (
+				["ArrowUp", "w", "k"].includes(e.key) &&
+				this.dir !== Direction.DOWN
+			) {
+				this.dir = Direction.UP;
+			} else if (
+				["ArrowDown", "s", "j"].includes(e.key) &&
+				this.dir !== Direction.UP
+			) {
+				this.dir = Direction.DOWN;
+			} else if (
+				["ArrowLeft", "a", "h"].includes(e.key) &&
+				this.dir !== Direction.RIGHT
+			) {
+				this.dir = Direction.LEFT;
+			} else if (
+				["ArrowRight", "d", "l"].includes(e.key) &&
+				this.dir !== Direction.LEFT
+			) {
+				this.dir = Direction.RIGHT;
+			}
+		});
+
+		window.addEventListener("keydown", (e: KeyboardEvent) => {
+			if (e.key === " ") {
+				this.speed = 100;
+			}
+		});
 	}
 
 	start() {
 		this.tick = 0;
 		window.requestAnimationFrame(this.gameLoop.bind(this));
-
-		// setTimeout(() => {
-		// 	window.requestAnimationFrame(this.gameLoop.bind(this));
-		// }, 500);
-		//
-		// setTimeout(() => {
-		// 	this.dir = Direction.RIGHT;
-		// 	window.requestAnimationFrame(this.gameLoop.bind(this));
-		// }, 1000);
 	}
 
 	gameLoop(timestamp: number) {
@@ -68,7 +99,7 @@ class Game {
 		this.tick = timestamp;
 		setTimeout(
 			() => window.requestAnimationFrame(this.gameLoop.bind(this)),
-			100,
+			this.speed,
 		);
 	}
 
@@ -76,10 +107,7 @@ class Game {
 		const head = Object.assign([], this.snake.path[0]);
 		const path = this.snake.path.slice(0, -1);
 
-		console.log("original path", path);
-		console.log("updating frane?");
-		console.log("path", path);
-		console.log("head", head);
+		console.log("direction:", dir);
 
 		if (dir == Direction.UP) {
 			head[1] = head[1] + 1;
@@ -103,14 +131,14 @@ class Game {
 			}
 		} else if (dir == Direction.DOWN) {
 			if (head[1] < 0) {
-				head[1] = this.size[1];
+				head[1] = this.size[1] - 1;
 			}
 		} else if (dir == Direction.LEFT) {
-			if (head[1] <= 0) {
-				head[0] = this.size[0];
+			if (head[0] < 0) {
+				head[0] = this.size[0] - 1;
 			}
 		} else if (dir == Direction.RIGHT) {
-			if (head[1] < this.size[0]) {
+			if (head[0] >= this.size[0]) {
 				head[0] = 0;
 			}
 		}
