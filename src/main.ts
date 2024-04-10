@@ -32,20 +32,22 @@ class Game {
 		this.food = [new Food(this.size[0] * 0.6, this.size[1] * 0.5)];
 
 		console.log("inital", this.snake);
+
+		this.engine.init(this);
 	}
 
 	start() {
 		this.tick = 0;
 		window.requestAnimationFrame(this.gameLoop.bind(this));
 
-		setTimeout(() => {
-			window.requestAnimationFrame(this.gameLoop.bind(this));
-		}, 500);
-
-		setTimeout(() => {
-			this.dir = Direction.RIGHT;
-			window.requestAnimationFrame(this.gameLoop.bind(this));
-		}, 1000);
+		// setTimeout(() => {
+		// 	window.requestAnimationFrame(this.gameLoop.bind(this));
+		// }, 500);
+		//
+		// setTimeout(() => {
+		// 	this.dir = Direction.RIGHT;
+		// 	window.requestAnimationFrame(this.gameLoop.bind(this));
+		// }, 1000);
 	}
 
 	gameLoop(timestamp: number) {
@@ -66,7 +68,7 @@ class Game {
 		this.lastFrame = frame;
 
 		this.tick = timestamp;
-		// window.requestAnimationFrame(this.gameLoop.bind(this));
+		window.requestAnimationFrame(this.gameLoop.bind(this));
 	}
 
 	updateFrame(timestamp: number, dir: Direction) {
@@ -140,6 +142,7 @@ class Food {
 }
 
 interface Renderer {
+	init: (game: Game) => void;
 	render: (frame: Frame) => void;
 }
 
@@ -150,7 +153,83 @@ class VizRenderer implements Renderer {
 	}
 }
 
-const engine = new VizRenderer();
+class BrowserRenderer implements Renderer {
+	pixel: number = 20;
+
+	container: HTMLElement | null = null;
+
+	constructor() {
+		this.container = document.getElementById("game");
+	}
+
+	createSnake(i: number, x: number, y: number) {
+		const snake = document.createElement("div");
+		snake.setAttribute("id", "snake_" + i);
+		snake.classList.add("snake");
+		snake.style.width = this.pixel + "px";
+		snake.style.height = this.pixel + "px";
+
+		snake.style.left = `${x * this.pixel}px`;
+		snake.style.bottom = `${y * this.pixel}px`;
+
+		this.container?.appendChild(snake);
+	}
+
+	createFood(i: number, x: number, y: number) {
+		const snake = document.createElement("div");
+		snake.setAttribute("id", "food_" + i);
+		snake.classList.add("food");
+		snake.style.width = this.pixel + "px";
+		snake.style.height = this.pixel + "px";
+
+		snake.style.left = `${x * this.pixel}px`;
+		snake.style.bottom = `${y * this.pixel}px`;
+
+		this.container?.appendChild(snake);
+	}
+
+	init(game: Game) {
+		if (this.container === null) {
+			throw new Error("Container not found. cannot render the game");
+		}
+		this.container.style.width = `${game.size[0] * this.pixel}px`;
+		this.container.style.height = `${game.size[1] * this.pixel}px`;
+
+		for (const x in game.snake.path) {
+			const path = game.snake.path[x];
+
+			this.createSnake(x, path[0], path[1]);
+		}
+
+		for (const x in game.food) {
+			const food = game.food[x];
+
+			this.createFood(x, food.x, food.y);
+		}
+	}
+
+	render(frame: Frame) {
+		if (this.container === null) {
+			throw new Error("Container not found. cannot render the game");
+		}
+
+		for (const x in frame.snake.path) {
+			const path = frame.snake.path[x];
+
+			const prevSnake = this.container.querySelector(`#snake_${x}`);
+
+			if (prevSnake) {
+				prevSnake.style.left = `${path[0] * this.pixel}px`;
+				prevSnake.style.bottom = `${path[1] * this.pixel}px`;
+				continue;
+			}
+
+			this.createSnake(x, path[0], path[1]);
+		}
+	}
+}
+
+const engine = new BrowserRenderer();
 
 const game = new Game(engine);
 
