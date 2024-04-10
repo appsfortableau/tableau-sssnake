@@ -31,8 +31,6 @@ class Game {
 		this.snake = new Snake(2, 5, 4);
 		this.food = [new Food(this.size[0] * 0.6, this.size[1] * 0.5)];
 
-		console.log("inital", this.snake);
-
 		this.engine.init(this);
 	}
 
@@ -68,7 +66,10 @@ class Game {
 		this.lastFrame = frame;
 
 		this.tick = timestamp;
-		window.requestAnimationFrame(this.gameLoop.bind(this));
+		setTimeout(
+			() => window.requestAnimationFrame(this.gameLoop.bind(this)),
+			100,
+		);
 	}
 
 	updateFrame(timestamp: number, dir: Direction) {
@@ -90,7 +91,29 @@ class Game {
 			head[1] = head[1] - 1;
 		}
 
+		this.outOfBounds(head, dir);
+
 		this.snake.path = [head].concat(path);
+	}
+
+	outOfBounds(head: Path, dir: Direction) {
+		if (dir == Direction.UP) {
+			if (head[1] >= this.size[1]) {
+				head[1] = 0;
+			}
+		} else if (dir == Direction.DOWN) {
+			if (head[1] < 0) {
+				head[1] = this.size[1];
+			}
+		} else if (dir == Direction.LEFT) {
+			if (head[1] <= 0) {
+				head[0] = this.size[0];
+			}
+		} else if (dir == Direction.RIGHT) {
+			if (head[1] < this.size[0]) {
+				head[0] = 0;
+			}
+		}
 	}
 }
 
