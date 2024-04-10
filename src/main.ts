@@ -141,7 +141,7 @@ class Game {
 			// increment snake.
 			this.snake.path.unshift(head);
 
-			// TODO: generate new food, within bound, and not colliding with snake
+			// generate new food, within bound, and not colliding with snake
 			const foodList = [...this.food];
 			foodList.splice(foodIndex, 1);
 
