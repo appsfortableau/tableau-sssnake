@@ -19,7 +19,6 @@ class D3Renderer implements Renderer {
 
 	constructor() {
 		this.container = document.getElementById("game");
-		// this.setContainerSize();
 
 		// set the dimensions and margins of the graph
 		const margin = { top: 0, right: 0, bottom: 0, left: 0 },
@@ -37,58 +36,6 @@ class D3Renderer implements Renderer {
 			.attr("transform", `translate(${margin.left}, ${margin.top})`);
 	}
 
-	// createSnake(i: number, x: number, y: number) {
-	// 	// Add dots
-	// 	this.d3
-	// 		.append("g")
-	// 		.selectAll("dot")
-	// 		.data([[x, y]])
-	// 		.join("circle")
-	// 		.attr("cx", ([x1]: [number, number]) => x(x1))
-	// 		.attr("cy", ([y1]: [number, number]) => y(y1))
-	// 		.attr("r", 5)
-	// 		.style("fill", "#69b3a2");
-	//
-	// 	// const snake = document.createElement("div");
-	// 	// snake.setAttribute("id", "snake_" + i);
-	// 	// snake.classList.add("snake");
-	// 	// snake.style.width = this.pixel + "px";
-	// 	// snake.style.height = this.pixel + "px";
-	// 	//
-	// 	// snake.style.left = `${x * this.pixel[0]}px`;
-	// 	// snake.style.bottom = `${y * this.pixel[1]}px`;
-	// 	//
-	// 	// this.container?.appendChild(snake);
-	// }
-
-	// createFood(x: number, y: number) {
-	// 	const snake = document.createElement("div");
-	// 	snake.setAttribute("id", `food_${x}_${y}`);
-	// 	snake.classList.add("food");
-	// 	snake.style.width = this.pixel + "px";
-	// 	snake.style.height = this.pixel + "px";
-	//
-	// 	snake.style.left = `${x * this.pixel[0]}px`;
-	// 	snake.style.bottom = `${y * this.pixel[1]}px`;
-	//
-	// 	this.container?.appendChild(snake);
-	// }
-
-	setContainerSize() {
-		if (this.container === null) {
-			throw new Error("Container not found. cannot render the game");
-		} else if (!this.game) {
-			throw new Error("Game not initialized yet.");
-		}
-
-		this.pixel = [
-			(window.innerWidth - 10) / this.game.size[0], // borders
-			(window.innerHeight - 10) / this.game.size[0], // borders
-		];
-		this.container.style.width = `${this.game.size[0] * this.pixel[0]}px`;
-		this.container.style.height = `${this.game.size[1] * this.pixel[1]}px`;
-	}
-
 	init(game: Game) {
 		this.game = game;
 
@@ -102,12 +49,6 @@ class D3Renderer implements Renderer {
 			.scaleLinear()
 			.domain([0, this.game.size[1]])
 			.range([this.container?.offsetHeight || 400, 0]);
-
-		// for (const x in game.snake.path) {
-		// 	const path = game.snake.path[x];
-		//
-		// 	this.createSnake(parseInt(x), path[0], path[1]);
-		// }
 
 		// Add snake
 		const groupSnake = this.d3.append("g");
