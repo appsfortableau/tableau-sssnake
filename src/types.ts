@@ -23,6 +23,14 @@ export class Frame {
 	snake: Snake;
 	// where is the current food located
 	food: Food[];
+	// what is the new/current score
+	score: number = 0;
+	// what is the level.
+	level: number = 1;
+	// what is the current Direction of the snake
+	direction: Direction = Direction.UP;
+	// what is the speed multiplier, float64/decimal
+	speedMultuplier: number = 1;
 
 	constructor(timestamp: number, snake: Snake, food: Food[]) {
 		console.log("Frame timestamp:", timestamp);

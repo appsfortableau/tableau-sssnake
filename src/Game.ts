@@ -1,6 +1,8 @@
 import Snake from "./Snake";
 import { Direction, Food, Frame, GameSize, Path, Renderer } from "./types";
 
+const KEY_SHIFT = "Shift";
+
 export default class Game {
 	engine: Renderer;
 	lastFrame: Frame | undefined;
@@ -38,28 +40,28 @@ export default class Game {
 
 	keymaps() {
 		window.addEventListener("keyup", (e: KeyboardEvent) => {
-			if (e.key === " ") {
+			if (e.key === KEY_SHIFT) {
 				this.speed = this.normalSpeed;
 				return;
 			}
 
 			if (
-				["ArrowUp", "w", "k"].includes(e.key) &&
+				["arrowup", "w", "k"].includes(e.key.toLowerCase()) &&
 				this.dir !== Direction.DOWN
 			) {
 				this.dir = Direction.UP;
 			} else if (
-				["ArrowDown", "s", "j"].includes(e.key) &&
+				["arrowdown", "s", "j"].includes(e.key.toLowerCase()) &&
 				this.dir !== Direction.UP
 			) {
 				this.dir = Direction.DOWN;
 			} else if (
-				["ArrowLeft", "a", "h"].includes(e.key) &&
+				["arrowleft", "a", "h"].includes(e.key.toLowerCase()) &&
 				this.dir !== Direction.RIGHT
 			) {
 				this.dir = Direction.LEFT;
 			} else if (
-				["ArrowRight", "d", "l"].includes(e.key) &&
+				["arrowright", "d", "l"].includes(e.key.toLowerCase()) &&
 				this.dir !== Direction.LEFT
 			) {
 				this.dir = Direction.RIGHT;
@@ -67,7 +69,7 @@ export default class Game {
 		});
 
 		window.addEventListener("keydown", (e: KeyboardEvent) => {
-			if (e.key === " ") {
+			if (e.key === KEY_SHIFT) {
 				this.speed = this.turboSpeed;
 			}
 		});
@@ -90,6 +92,12 @@ export default class Game {
 		const food: Food[] = Object.assign([], this.food);
 
 		const frame = new Frame(timestamp, snake, food);
+		frame.score = this.score;
+		frame.level = this.level;
+		frame.direction = this.dir;
+		frame.speedMultuplier =
+			Math.round((this.speed / this.normalSpeed) * 100) / 100;
+
 		this.engine.render(frame);
 		this.lastFrame = frame;
 
@@ -102,8 +110,6 @@ export default class Game {
 
 	updateFrame(_: number, dir: Direction) {
 		const head = Object.assign([], this.snake.path[0]);
-
-		console.log("direction:", dir);
 
 		if (dir == Direction.UP) {
 			head[1] = head[1] + 1;
@@ -125,8 +131,11 @@ export default class Game {
 			this.eaten += 1;
 			this.level = Math.round(this.eaten / this.foodPerLevel) + 1;
 			this.score += (this.eaten / this.foodPerLevel) * this.pointsPerFood;
-			// TODO: Increase speed when levelup
-			// this.speed = this.speed / (this.level * .75)
+			// Increase speed when levelup, min on 10ms per level
+			console.log("Speed increase", 10 * (this.level - 1) * 0.75);
+
+			this.speed = this.normalSpeed - 10 * (this.level - 1) * 0.75;
+			this.turboSpeed = this.speed / 5;
 
 			// increment snake.
 			this.snake.path.unshift(head);
@@ -172,7 +181,7 @@ export default class Game {
 			const food = this.food[i];
 
 			if (food.x === head[0] && food.y === head[1]) {
-				console.log([true, food, parseInt(i)]);
+				console.log("YUMMIIII");
 				return [true, food, parseInt(i)];
 			}
 		}
