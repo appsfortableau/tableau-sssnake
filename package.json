@@ -9,8 +9,12 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@types/d3": "^7.4.3",
     "@types/tableau": "^2.2.8",
     "typescript": "^5.0.2",
     "vite": "^4.4.5"
+  },
+  "dependencies": {
+    "d3": "^7.9.0"
   }
 }

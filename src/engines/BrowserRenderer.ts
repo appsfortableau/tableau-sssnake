@@ -1,5 +1,5 @@
-import Game from "./Game";
-import { Food, Frame, Renderer } from "./types";
+import Game from "../Game";
+import { Food, Frame, Renderer } from "../types";
 
 class BrowserRenderer implements Renderer {
 	pixel: number = 20;
