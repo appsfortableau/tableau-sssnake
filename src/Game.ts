@@ -4,7 +4,7 @@ import { Direction, Food, Frame, GameSize, Path, Renderer } from "./types";
 const KEY_SHIFT = "Shift";
 
 export default class Game {
-	engine: Renderer;
+	engines: Renderer[];
 	lastFrame: Frame | undefined;
 
 	// score/level vars
@@ -18,7 +18,7 @@ export default class Game {
 	dir: Direction = Direction.UP;
 	tick: number = 0;
 	size: GameSize = [48, 48];
-	speed: number = 1000;
+	speed: number = 750;
 	normalSpeed: number = 0;
 	turboSpeed: number = 0;
 
@@ -27,14 +27,14 @@ export default class Game {
 	// where is the current food located
 	food: Food[];
 
-	constructor(engine: Renderer) {
-		this.engine = engine;
+	constructor(...engine: Renderer[]) {
+		this.engines = engine;
 		this.snake = new Snake(2, 5, 4);
 		this.food = [new Food(this.size[0] * 0.6, this.size[1] * 0.5)];
 		this.normalSpeed = this.speed;
 		this.turboSpeed = this.speed / 5;
 
-		this.engine.init(this);
+		this.engines.forEach((engine: Renderer) => engine.init(this));
 		this.keymaps();
 	}
 
@@ -98,7 +98,7 @@ export default class Game {
 		frame.speedMultuplier =
 			Math.round((this.speed / this.normalSpeed) * 100) / 100;
 
-		this.engine.render(frame);
+		this.engines.forEach((engine: Renderer) => engine.render(frame));
 		this.lastFrame = frame;
 
 		this.tick = timestamp;

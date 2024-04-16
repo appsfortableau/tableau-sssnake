@@ -11,6 +11,8 @@
   "devDependencies": {
     "@types/d3": "^7.4.3",
     "@types/tableau": "^2.2.8",
+    "browserslist": "^4.23.0",
+    "lightningcss": "^1.24.1",
     "typescript": "^5.0.2",
     "vite": "^4.4.5"
   },

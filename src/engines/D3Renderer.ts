@@ -2,10 +2,10 @@ import Game from "../Game";
 import * as d3 from "d3";
 import { Food, Frame, Renderer } from "../types";
 
-type D3Selecion = d3.Selection<SVGGElement, unknown, HTMLElement, any>;
+type D3Selecion = d3.Selection<SVGSVGElement, unknown, HTMLElement, any>;
 
 class D3Renderer implements Renderer {
-	pixel: number[] = [20, 20];
+	pixel: number[] = [50, 50];
 	game: Game | undefined;
 
 	// d3 container
@@ -21,19 +21,31 @@ class D3Renderer implements Renderer {
 		this.container = document.getElementById("game");
 
 		// set the dimensions and margins of the graph
-		const margin = { top: 0, right: 0, bottom: 0, left: 0 },
-			width = (this.container?.offsetWidth || 470) - margin.left - margin.right,
-			height =
-				(this.container?.offsetHeight || 470) - margin.top - margin.bottom;
+		const margin = { top: 0, right: 0, bottom: 0, left: 0 };
+		const size = this.getSize();
 
 		// append the svg object to the body of the page
 		this.d3 = d3
 			.select("#game")
 			.append("svg")
-			.attr("width", width + margin.left + margin.right)
-			.attr("height", height + margin.top + margin.bottom)
-			.append("g")
-			.attr("transform", `translate(${margin.left}, ${margin.top})`);
+			.attr("class", "game-svg")
+			.attr("width", size)
+			.attr("height", size)
+			.attr("transform", `translate(${margin.left}, ${margin.top})`)
+			.attr("viewBox", `0 0 ${size} ${size}`);
+
+		window.addEventListener("resize", () => {
+			const size = this.getSize();
+
+			this.d3.attr("width", size).attr("height", size);
+		});
+	}
+
+	getSize(): number {
+		const windowWidth = Math.round(this.container?.offsetWidth || 1024);
+		const windowHeight = Math.round(this.container?.offsetHeight || 756);
+
+		return windowHeight > windowWidth ? windowWidth : windowHeight;
 	}
 
 	init(game: Game) {
@@ -65,10 +77,6 @@ class D3Renderer implements Renderer {
 		groupSnake
 			.append("path")
 			.datum(game.snake.path)
-			.attr("fill", "none")
-			.attr("stroke", "steelblue")
-			.attr("stroke-width", 10)
-			.attr("stroke-linecap", "round")
 			.attr(
 				"d",
 				d3
@@ -82,7 +90,7 @@ class D3Renderer implements Renderer {
 
 		// Add food
 		const groupFood = this.d3.append("g");
-		groupFood.attr("class", "food");
+		groupFood.attr("class", "food-group");
 		groupFood
 			.selectAll("dot")
 			.data(game.food)
@@ -90,7 +98,7 @@ class D3Renderer implements Renderer {
 			.attr("cx", (food: Food) => this.x(food.x))
 			.attr("cy", (food: Food) => this.y(food.y))
 			.attr("r", 5)
-			.style("fill", "#ff0000");
+			.attr("class", "food");
 	}
 
 	render(frame: Frame) {
@@ -124,7 +132,7 @@ class D3Renderer implements Renderer {
 			);
 
 		// check which items should be removed
-		const groupFood = this.d3.select(".food");
+		const groupFood = this.d3.select(".food-group");
 		groupFood
 			.selectAll("circle")
 			.data(frame.food)
@@ -133,7 +141,7 @@ class D3Renderer implements Renderer {
 			.attr("cy", (food: Food) => this.y(food.y))
 			.attr("id", (food: Food) => `food_${food.x}_${food.y}`)
 			.attr("r", 5)
-			.style("fill", "#ff0000");
+			.attr("class", "food");
 	}
 }
 export default D3Renderer;

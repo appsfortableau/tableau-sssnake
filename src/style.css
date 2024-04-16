@@ -3,6 +3,9 @@
   line-height: 1.5;
   font-weight: 400;
 
+  --primary-gray: #1a181b;
+  --secondary-gray: #2a282a;
+
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -25,29 +28,59 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%; 
+  width: 100%;
   height: 100%;
   width: 100vw;
   min-height: 100vh;
+  background-color: var(--primary-gray);
 }
 
-.playground {
+.playground-d3 {
+  aspect-ratio: 1/1;
+  width: 100%;
+  height: auto;
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .game-svg {
+    aspect-ratio: 1/1;
+    border: 1px solid var(--secondary-gray);
+    border-radius: 10px;
+    width: fit-content;
+    height: fit-content;
+  }
+  .snake {
+    fill: none;
+    stroke: yellow;
+    stroke-width: 5px;
+    stroke-linecap: round;
+  }
+
+  .food-group {
+    .food {
+      position: relative;
+      fill: purple;
+      &:after {
+        content: '';
+        width: 10px;
+        height: 10px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        background-image: url(/hamburger.png);
+        background-repeat: no-repeat;
+        background-size: cover;
+      }
+    }
+  }
+}
+
+.playground-browser {
   position: relative;
   border: 5px solid red;
   width: 480px;
   height: 480px;
   background: lightgray;
-}
-
-.snake {
-  position: absolute;
-  background: blue;
-  border: 1px solid orange;
-}
-
-.food {
-  position: absolute;
-  background-image: url(/hamburger.png);
-  background-repeat: no-repeat;
-  background-size: cover;
 }
