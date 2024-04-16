@@ -17,7 +17,7 @@ export default class Game {
 	// game engine vars
 	dir: Direction = Direction.UP;
 	tick: number = 0;
-	size: GameSize = [48, 48];
+	size: GameSize = [32, 32];
 	speed: number = 750;
 	normalSpeed: number = 0;
 	turboSpeed: number = 0;

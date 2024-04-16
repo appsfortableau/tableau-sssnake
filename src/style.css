@@ -3,8 +3,12 @@
   line-height: 1.5;
   font-weight: 400;
 
-  --primary-gray: #1a181b;
-  --secondary-gray: #2a282a;
+  --primary-bg: #1a181b;
+  --secondary-text: #5E5A5E;
+  --secondary-line: #2a282a;
+
+  --snake: #D90368;
+  --food: #FB8B24;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -32,7 +36,7 @@ body {
   height: 100%;
   width: 100vw;
   min-height: 100vh;
-  background-color: var(--primary-gray);
+  background-color: var(--primary-bg);
 }
 
 .playground-d3 {
@@ -46,22 +50,33 @@ body {
   justify-content: center;
   .game-svg {
     aspect-ratio: 1/1;
-    border: 1px solid var(--secondary-gray);
+    border: 1px solid var(--secondary-line);
     border-radius: 10px;
     width: fit-content;
     height: fit-content;
+    overflow: unset;
+  }
+  .axis-group {
+    .tick {
+      line {
+        color: var(--secondary-line);
+      }
+      text {
+
+        color: var(--secondary-text);
+      }
+    }
   }
   .snake {
     fill: none;
-    stroke: yellow;
+    stroke: var(--snake);
     stroke-width: 5px;
     stroke-linecap: round;
   }
-
   .food-group {
     .food {
       position: relative;
-      fill: purple;
+      fill: var(--food);
       &:after {
         content: '';
         width: 10px;
