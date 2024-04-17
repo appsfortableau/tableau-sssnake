@@ -1,5 +1,5 @@
 import Game from "./Game";
-import Snake from "./Snake";
+import { SomeSnake } from "./Snake";
 
 export interface Renderer {
 	init: (game: Game) => void;
@@ -20,7 +20,7 @@ export class Food {
 
 export class Frame {
 	// where is the snake, and what is its body
-	snake: Snake;
+	snake: SomeSnake;
 	// where is the current food located
 	food: Food[];
 	// what is the new/current score
@@ -32,7 +32,7 @@ export class Frame {
 	// what is the speed multiplier, float64/decimal
 	speedMultuplier: number = 1;
 
-	constructor(timestamp: number, snake: Snake, food: Food[]) {
+	constructor(timestamp: number, snake: SomeSnake, food: Food[]) {
 		console.log("Frame timestamp:", timestamp);
 
 		this.snake = snake;

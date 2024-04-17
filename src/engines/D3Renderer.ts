@@ -1,8 +1,11 @@
 import Game from "../Game";
 import * as d3 from "d3";
-import { Food, Frame, Renderer } from "../types";
+import { Direction, Food, Frame, Renderer } from "../types";
+import { EyeElm } from "../Snake";
 
 type D3Selecion = d3.Selection<SVGSVGElement, unknown, HTMLElement, any>;
+
+const FOOD_RATIO = 1.75;
 
 class D3Renderer implements Renderer {
 	pixel: number[] = [50, 50];
@@ -23,6 +26,9 @@ class D3Renderer implements Renderer {
 	};
 
 	container: HTMLElement | null = null;
+
+	// default size
+	snakeFoodSize: number = 10;
 
 	constructor() {
 		this.container = document.getElementById("game");
@@ -67,6 +73,8 @@ class D3Renderer implements Renderer {
 		const gridY = this.game.size[1];
 		const size = this.getSize();
 
+		this.snakeFoodSize = Math.round(size / game.size[0] / 2);
+
 		const offsetX = this.margins.left + this.margins.right;
 		const offsetY = this.margins.top + this.margins.bottom;
 		// Add X axis
@@ -83,10 +91,6 @@ class D3Renderer implements Renderer {
 		const axis = this.d3.append("g");
 		axis.attr("class", "axis-group");
 
-		function labelFormatter(x: number): string | null {
-			return x === 0 ? null : x.toString();
-		}
-
 		// Add X axis
 		axis
 			.append("g")
@@ -96,22 +100,24 @@ class D3Renderer implements Renderer {
 				d3
 					.axisBottom(this.x)
 					.ticks(game.size[0])
-					// .tickFormat(labelFormatter)
 					.tickSize(-(size - offsetX)),
 			)
 			.selectAll(".tick text")
-			.attr("transform", "translate(0, 5)")
+			.attr("transform", "translate(0, 5)");
 
 		// Add Y axis
+		const yAxis = d3.axisLeft(this.y);
 		axis
 			.append("g")
 			.attr("class", "y-axis")
 			.call(
-				d3
-					.axisLeft(this.y)
+				yAxis
 					.ticks(game.size[1])
-					.tickFormat(labelFormatter)
+					.tickFormat((x: number): string | null =>
+						x === 0 ? null : x.toString(),
+					)
 					.tickSize(-(size - offsetY)),
+				0,
 			)
 			.selectAll(".tick text")
 			.attr("transform", "translate(-5, 0)");
@@ -121,7 +127,8 @@ class D3Renderer implements Renderer {
 		axis.select(".y-axis .tick:first-child line").remove();
 		axis.select(".y-axis .tick:last-child line").remove();
 
-		axis.select(".x-axis .tick:first-child text")
+		axis
+			.select(".x-axis .tick:first-child text")
 			.attr("transform", "translate(-10, 5)");
 		axis.select(".x-axis .tick:last-child line").remove();
 		axis.select(".x-axis .tick:first-child line").remove();
@@ -129,47 +136,55 @@ class D3Renderer implements Renderer {
 		// Add snake
 		const groupSnake = this.d3.append("g");
 		groupSnake.attr("class", "snake");
-		// .attr(
-		// 	"transform",
-		// 	`translate(${this.margins.left}, ${this.margins.top})`,
-		// );
-		// groupSnake
-		// 	.selectAll("dot")
-		// 	.data(game.snake.path)
-		// 	.join("circle")
-		// 	.attr("cx", ([x]: [number, number]) => this.x(x))
-		// 	.attr("cy", ([_, y]: [number, number]) => this.y(y))
-		// 	.attr("r", 5)
-		// 	.style("fill", "#69b3a2");
 
-		groupSnake
-			.append("path")
-			.datum(game.snake.path)
-			.attr(
-				"d",
-				d3
-					.line()
-					.x(([x]) => this.x(x))
-					.y(([_, y]) => this.y(y))
-					// .curve(d3.curveCatmullRom.alpha(0.5)),
-					.curve(d3.curveNatural),
-			)
-			.attr("class", "snake-line");
+		if (game.snake) {
+			const snakePath = game.snake.path;
+
+			groupSnake
+				.append("path")
+				.datum(snakePath)
+				.attr("stroke-width", this.snakeFoodSize)
+				.attr("class", "snake-body")
+				.attr(
+					"d",
+					d3
+						.line()
+						.x(([x]) => this.x(x))
+						.y(([_, y]) => this.y(y))
+						.curve(d3.curveNatural),
+				);
+
+			// console.log(game.snake.eyesRotation(), 'asdfasdf')
+
+			// eyes
+			groupSnake
+				.append("g")
+				.attr("class", "snake-eyes")
+				.selectAll("dot")
+				.attr(
+					"transform",
+					`translate(${this.x(snakePath[0][0])}, ${this.y(
+						snakePath[0][1],
+					)}) rotate(${game.snake.eyesRotation()})`,
+				)
+				.data(game.snake.eyes(this.snakeFoodSize))
+				.join("circle")
+				.attr("cx", (eye: EyeElm) => eye.x)
+				.attr("cy", (eye: EyeElm) => eye.y)
+				.attr("r", (eye: EyeElm) => eye.size)
+				.attr("fill", (eye: EyeElm) => eye.color);
+		}
 
 		// Add food
 		const groupFood = this.d3.append("g");
 		groupFood.attr("class", "food-group");
-		// groupFood.attr(
-		// 	"transform",
-		// 	`translate(${this.margins.left}, ${this.margins.top})`,
-		// );
 		groupFood
 			.selectAll("dot")
 			.data(game.food)
 			.join("circle")
 			.attr("cx", (food: Food) => this.x(food.x))
 			.attr("cy", (food: Food) => this.y(food.y))
-			.attr("r", 5)
+			.attr("r", this.snakeFoodSize / FOOD_RATIO)
 			.attr("class", "food");
 	}
 
@@ -178,30 +193,41 @@ class D3Renderer implements Renderer {
 			throw new Error("Container not found. cannot render the game");
 		}
 
-		// this.d3
-		// 	.select(".snake")
-		// 	.selectAll("circle")
-		// 	.data(frame.snake.path)
-		// 	.transition()
-		// 	.duration(10)
-		// 	.attr("cx", ([x]: [number, number]) => this.x(x))
-		// 	.attr("cy", ([_, y]: [number, number]) => this.y(y));
+		if (frame.snake) {
+			const snakePath = frame.snake.path;
+			const snake = this.d3.select(".snake");
+			snake
+				.select("path")
+				.datum(frame.snake.path)
+				.transition()
+				.duration(50)
+				.attr(
+					"d",
+					d3
+						.line()
+						.x(([x]) => this.x(x))
+						.y(([_, y]) => this.y(y))
+						// .curve(d3.curveCatmullRom.alpha(0.5)),
+						.curve(d3.curveNatural),
+				);
 
-		this.d3
-			.select(".snake")
-			.select("path")
-			.datum(frame.snake.path)
-			.transition()
-			.duration(50)
-			.attr(
-				"d",
-				d3
-					.line()
-					.x(([x]) => this.x(x))
-					.y(([_, y]) => this.y(y))
-					// .curve(d3.curveCatmullRom.alpha(0.5)),
-					.curve(d3.curveNatural),
-			);
+			// eyes
+			snake
+				.select(".snake-eyes")
+				.attr(
+					"transform",
+					`translate(${this.x(snakePath[0][0])}, ${this.y(
+						snakePath[0][1],
+					)}) rotate(${frame.snake.eyesRotation()})`,
+				)
+				.selectAll("circle")
+				.data(frame.snake.eyes(this.snakeFoodSize))
+				.join("circle")
+				.attr("cx", (eye: EyeElm) => eye.x)
+				.attr("cy", (eye: EyeElm) => eye.y)
+				.attr("r", (eye: EyeElm) => eye.size)
+				.attr("fill", (eye: EyeElm) => eye.color);
+		}
 
 		// check which items should be removed
 		const groupFood = this.d3.select(".food-group");
@@ -212,8 +238,9 @@ class D3Renderer implements Renderer {
 			.attr("cx", (food: Food) => this.x(food.x))
 			.attr("cy", (food: Food) => this.y(food.y))
 			.attr("id", (food: Food) => `food_${food.x}_${food.y}`)
-			.attr("r", 5)
+			.attr("r", this.snakeFoodSize / FOOD_RATIO)
 			.attr("class", "food");
 	}
 }
+
 export default D3Renderer;

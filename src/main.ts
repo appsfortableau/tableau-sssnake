@@ -5,6 +5,9 @@ import "./style.css";
 
 import Game from "./Game";
 import D3Renderer from "./engines/D3Renderer";
+import TableauRenderer from "./engines/TableauRenderer";
+import { Direction, Food } from "./types";
+import Snake from "./Snake";
 
 (() => {
 	function updateDataAndRender(e) {
@@ -15,12 +18,16 @@ import D3Renderer from "./engines/D3Renderer";
 		console.log("Open configurer");
 	}
 
-	const engine = new D3Renderer();
-	const game = new Game(engine);
+	const d3 = new D3Renderer();
+	// const tabl = new TableauRenderer(window.tableau.extensions);
 
+	const game = new Game([d3], new Snake(2, 5, 3, Direction.UP));
+
+	game.setData([new Food(32 * 0.6, 32 * 0.5)]);
+	game.initEngines();
+
+	// game.runFrame(new Date().getTime());
 	game.start();
-
-
 
 	// console.log("Loading Tableau");
 	// Tableau.extensions.initializeAsync({ configure: configure }).then(

@@ -1,9 +1,13 @@
-import Snake from "./Snake";
+import Snake, { SomeSnake } from "./Snake";
 import { Direction, Food, Frame, GameSize, Path, Renderer } from "./types";
 
 const KEY_SHIFT = "Shift";
 
+const ERR_ENGINES_NOT_STARTED =
+	"Engines are not initialized yet! Please make sure to run the `initEngines` method.";
+
 export default class Game {
+	hasInitEngines: boolean = false;
 	engines: Renderer[];
 	lastFrame: Frame | undefined;
 
@@ -23,18 +27,23 @@ export default class Game {
 	turboSpeed: number = 0;
 
 	// where is the snake, and what is its body
-	snake: Snake;
+	snake: SomeSnake = undefined;
 	// where is the current food located
-	food: Food[];
+	food: Food[] = [];
 
-	constructor(...engine: Renderer[]) {
+	constructor(
+		engine: Renderer[],
+		snake: SomeSnake = undefined,
+		food: Food[] = [], // [new Food(this.size[0] * 0.6, this.size[1] * 0.5)];
+		speed: number = 750,
+	) {
 		this.engines = engine;
-		this.snake = new Snake(2, 5, 4);
-		this.food = [new Food(this.size[0] * 0.6, this.size[1] * 0.5)];
+		this.snake = snake;
+		this.food = food;
+		this.speed = speed;
 		this.normalSpeed = this.speed;
 		this.turboSpeed = this.speed / 5;
 
-		this.engines.forEach((engine: Renderer) => engine.init(this));
 		this.keymaps();
 	}
 
@@ -75,8 +84,27 @@ export default class Game {
 		});
 	}
 
-	start() {
+	initEngines() {
+		this.engines.forEach((engine: Renderer) => engine.init(this));
+		this.hasInitEngines = true;
+	}
+
+	setData(food: Food[]) {
+		this.food = food;
+	}
+
+	start(play: boolean = true) {
+		if (!this.hasInitEngines) {
+			throw new Error(ERR_ENGINES_NOT_STARTED);
+		}
+
 		this.tick = 0;
+
+		if (play === false) {
+			this.gameLoop(new Date().getTime());
+			return;
+		}
+
 		window.requestAnimationFrame(this.gameLoop.bind(this));
 	}
 
@@ -88,7 +116,21 @@ export default class Game {
 			this.updateFrame(progress, this.dir);
 		}
 
-		const snake: Snake = Object.assign({}, this.snake);
+		this.runFrame(timestamp);
+
+		this.tick = timestamp;
+		setTimeout(
+			() => window.requestAnimationFrame(this.gameLoop.bind(this)),
+			this.speed,
+		);
+	}
+
+	runFrame(timestamp: number) {
+		if (!this.hasInitEngines) {
+			throw new Error(ERR_ENGINES_NOT_STARTED);
+		}
+
+		const snake: SomeSnake = this.snake ? this.snake : undefined;
 		const food: Food[] = Object.assign([], this.food);
 
 		const frame = new Frame(timestamp, snake, food);
@@ -98,17 +140,20 @@ export default class Game {
 		frame.speedMultuplier =
 			Math.round((this.speed / this.normalSpeed) * 100) / 100;
 
+		if (snake) {
+			snake.dir = frame.direction;
+		}
+
 		this.engines.forEach((engine: Renderer) => engine.render(frame));
 		this.lastFrame = frame;
-
-		this.tick = timestamp;
-		setTimeout(
-			() => window.requestAnimationFrame(this.gameLoop.bind(this)),
-			this.speed,
-		);
 	}
 
 	updateFrame(_: number, dir: Direction) {
+		// in case snake wasnt set yet.
+		if (!this.snake) {
+			return;
+		}
+
 		const head = Object.assign([], this.snake.path[0]);
 
 		if (dir == Direction.UP) {
@@ -190,7 +235,8 @@ export default class Game {
 	}
 
 	newFoodItem(food: Food[]) {
-		const exclude = [...this.snake.path, ...food].map((x) => JSON.stringify(x));
+		const snakePath = this.snake ? this.snake.path : [];
+		const exclude = [...snakePath, ...food].map((x) => JSON.stringify(x));
 
 		// good be more efficient when after 50% of the game.
 		// TODO: does it find 0,0 and 0,X or X,0??
