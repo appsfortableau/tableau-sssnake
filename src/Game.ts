@@ -47,6 +47,17 @@ export default class Game {
 		this.keymaps();
 	}
 
+	setSize(x: number, y: number): Game {
+		this.size = [x, y];
+
+		return this;
+	}
+
+	addSnake(snake: Snake): Game {
+		this.snake = snake;
+		return this;
+	}
+
 	keymaps() {
 		window.addEventListener("keyup", (e: KeyboardEvent) => {
 			if (e.key === KEY_SHIFT) {
@@ -84,13 +95,17 @@ export default class Game {
 		});
 	}
 
-	initEngines() {
+	initEngines(): Game {
 		this.engines.forEach((engine: Renderer) => engine.init(this));
 		this.hasInitEngines = true;
+
+		return this;
 	}
 
-	setData(food: Food[]) {
+	setData(food: Food[]): Game {
 		this.food = food;
+
+		return this;
 	}
 
 	start(play: boolean = true) {

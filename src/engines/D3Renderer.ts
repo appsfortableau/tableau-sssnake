@@ -49,6 +49,13 @@ class D3Renderer implements Renderer {
 			.attr("height", graphHeight)
 			.attr("viewBox", `0 0 ${size} ${size}`);
 
+		this.d3.append("defs").html(`
+				<linearGradient id="food-shadow" x1="0%" y1="0%" x2="0%" y2="100%">
+					<stop stop-color="#FB8B24" stop-opacity="0.5"/>
+					<stop offset="1" stop-color="#FB8B24" stop-opacity="0"/>
+				</linearGradient>
+			`);
+
 		window.addEventListener("resize", () => {
 			const size = this.getSize();
 
@@ -178,6 +185,23 @@ class D3Renderer implements Renderer {
 		// Add food
 		const groupFood = this.d3.append("g");
 		groupFood.attr("class", "food-group");
+
+		// Food shadow/gradient
+		groupFood
+			.selectAll("dot")
+			.data(game.food)
+			.join("rect")
+			.attr(
+				"x",
+				(food: Food) => this.x(food.x) - (this.snakeFoodSize * 1.15) / 2,
+			)
+			.attr("y", (food: Food) => this.y(food.y))
+			.attr("width", this.snakeFoodSize * 1.15)
+			.attr("height", this.snakeFoodSize * 6)
+			.attr("fill", "url(#food-shadow)")
+			.attr("class", "food-shadow");
+
+		// Food circle
 		groupFood
 			.selectAll("dot")
 			.data(game.food)
