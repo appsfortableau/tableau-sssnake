@@ -14,13 +14,15 @@
     <context-menu>
       <configure-context-menu-item />
     </context-menu>
-    <encoding id="measures">
+    <encoding id="axis_x">
       <display-name>X</display-name>
+      <fields max-count="1" />
       <encoding-icon token="letter-x" />
       <tooltip>X Columns can be added here</tooltip>
     </encoding>
-    <encoding id="dimensions">
+    <encoding id="axis_y">
       <display-name>Y</display-name>
+      <fields max-count="1" />
       <encoding-icon token="letter-y" />
       <tooltip>Y Rows can be added here</tooltip>
     </encoding>

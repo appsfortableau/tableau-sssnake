@@ -6,9 +6,9 @@ export default {
 		transformer: "lightningcss",
 		lightningcss: {
 			targets: browserslistToTargets(browserslist(">= 0.25%")),
-      drafts: {
-        nesting: true
-      }
+			drafts: {
+				nesting: true,
+			},
 		},
 	},
 	build: {

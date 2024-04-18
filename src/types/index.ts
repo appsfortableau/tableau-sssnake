@@ -1,10 +1,12 @@
-import Game from "./Game";
-import { SomeSnake } from "./Snake";
+import Game from "../Game";
+import { SomeSnake } from "../Snake";
 
 export interface Renderer {
 	init: (game: Game) => void;
 	render: (frame: Frame) => void;
 }
+
+export type Some<T> = T | undefined;
 
 export type Path = [number, number];
 

@@ -5,36 +5,23 @@ import D3Renderer from "./engines/D3Renderer";
 import TableauRenderer from "./engines/TableauRenderer";
 import { Direction, Food } from "./types";
 import Snake from "./Snake";
-import { Extensions } from "@tableau/extensions-api-types";
-import type * as TableauModule from "@tableau/extensions-api-types/ExternalContract/Extensions/Namespaces/Tableau";
+import { Tableau } from "./types/extensions-api-types";
 
-// type TableauModule = {
-// 	extensions: Extensions;
-// 	TableauEventType: TableauEventType;
-// };
-
-((Tableau: TableauModule) => {
-	const TableauEventType = Tableau.TableauEventType;
-
-	function updateDataAndRender(e) {
-		console.log(e);
-	}
-
+((tableau: Tableau) => {
 	function configure() {
 		console.log("Open configurer");
 	}
 
-	console.log(Tableau);
+	console.log(tableau);
 
 	const d3 = new D3Renderer();
-	const tabl = new TableauRenderer(Tableau);
+	const tabl = new TableauRenderer(tableau);
 
 	const game = new Game([d3, tabl]);
 
-	// console.log("Loading Tableau");
-	Tableau.extensions.initializeAsync({ configure: configure }).then(
+	tableau.extensions.initializeAsync({ configure: configure }).then(
 		() => {
-			console.log(Tableau);
+			console.log(tableau);
 			tabl.initTableau();
 
 			// game.setSize(32, 32);
@@ -55,17 +42,9 @@ import type * as TableauModule from "@tableau/extensions-api-types/ExternalContr
 			// Render only the first frame, and do not start the game
 			game.runFrame(new Date().getTime());
 			// // Get the worksheet that the Viz Extension is running in
-			const worksheet = Tableau.extensions.worksheetContent.worksheet;
-			console.log(worksheet);
-
-			console.log(`The name of the worksheet is ${worksheet.name}`);
-
-			// Listen to event for when the summary data backing the worksheet has changed.
-			// This tells us that we should refresh the data and encoding map.
-			worksheet.addEventListener(
-				TableauEventType.SummaryDataChanged,
-				updateDataAndRender,
-			);
+			// const worksheet = tableau.extensions.worksheetContent?.worksheet;
+			// console.log(worksheet);
+			// console.log(`The name of the worksheet is ${worksheet.name}`);
 
 			// actually start the game..
 			// game.start();

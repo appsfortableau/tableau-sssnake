@@ -9,7 +9,6 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "@tableau/extensions-api-types": "^1.11.0",
     "@types/d3": "^7.4.3",
     "browserslist": "^4.23.0",
     "lightningcss": "^1.24.1",
