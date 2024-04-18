@@ -1,29 +1,35 @@
 import Game from "./Game";
 import { Frame, Renderer } from "./types";
+import {
+	Extensions,
+	Parameter,
+	VisualSpecification,
+	Worksheet,
+} from "@tableau/extensions-api-types";
 
-module mytableau {
-	export type extensions = {
-		dashboardContent: {
-			dashboard: tableau.Dashboard;
-		};
-		worksheetContent: {
-			worksheet: Worksheet;
-		};
-	};
-
-	export interface Parameter extends tableau.Parameter {
-		changeValueAsync(
-			newValue: string | number | boolean | Date,
-		): Promise<tableau.DataValue>;
-	}
-
-	export interface Worksheet extends tableau.Worksheet {
-		findParameterAsync(
-			paramName: string,
-		): Promise<tableau.Parameter | undefined>;
-		getParametersAsync(): Promise<tableau.Parameter[]>;
-	}
-}
+// module mytableau {
+//   export type extensions = {
+//     dashboardContent: {
+//       dashboard: tableau.Dashboard;
+//     };
+//     worksheetContent: {
+//       worksheet: Worksheet;
+//     };
+//   };
+//
+//   export interface Parameter extends tableau.Parameter {
+//     changeValueAsync(
+//       newValue: string | number | boolean | Date
+//     ): Promise<tableau.DataValue>;
+//   }
+//
+//   export interface Worksheet extends tableau.Worksheet {
+//     findParameterAsync(
+//       paramName: string
+//     ): Promise<tableau.Parameter | undefined>;
+//     getParametersAsync(): Promise<tableau.Parameter[]>;
+//   }
+// }
 
 class TableauRenderer implements Renderer {
 	seperator = "::";
@@ -31,19 +37,22 @@ class TableauRenderer implements Renderer {
 	game: Game | undefined;
 	state: string = "01::0000";
 
-	tableau: mytableau.extensions;
-	worksheet: mytableau.Worksheet;
-	paramState: mytableau.Parameter | undefined;
+	tableau: Extensions;
+	worksheet: Worksheet;
+	paramState: Parameter | undefined;
+	encodings: VisualSpecification | undefined;
 
-	constructor(t: mytableau.extensions) {
-		this.tableau = t;
-		this.worksheet = this.tableau.worksheetContent.worksheet;
+	constructor(t: any) {
+		this.tableau = t.extensions as Extensions;
+		this.worksheet = t.extensions.worksheetContent.worksheet;
 	}
 
 	async initTableau() {
-		this.worksheet = this.tableau.worksheetContent.worksheet;
+		this.worksheet = this.tableau.worksheetContent?.worksheet;
 
 		this.paramState = await this.worksheet?.findParameterAsync("state");
+		this.encodings = await this.worksheet?.getVisualSpecificationAsync();
+		console.log(this.encodings);
 	}
 
 	init(game: Game) {

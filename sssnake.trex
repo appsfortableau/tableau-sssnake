@@ -15,28 +15,14 @@
       <configure-context-menu-item />
     </context-menu>
     <encoding id="measures">
-      <display-name>Measures</display-name>
-      <data-spec>
-        <data-type>numeric</data-type>
-      </data-spec>
-      <role-spec>
-        <role-type>continuous-measure</role-type>
-        <role-type>discrete-measure</role-type>
-      </role-spec>
-      <encoding-icon token="letter-m" />
-      <tooltip>Measure Columns can be added here</tooltip>
+      <display-name>X</display-name>
+      <encoding-icon token="letter-x" />
+      <tooltip>X Columns can be added here</tooltip>
     </encoding>
     <encoding id="dimensions">
-      <display-name>Dimensions</display-name>
-      <data-spec>
-        <data-type>string</data-type>
-      </data-spec>
-      <role-spec>
-        <role-type>continuous-dimension</role-type>
-        <role-type>discrete-dimension</role-type>
-      </role-spec>
-      <encoding-icon token="letter-d" />
-      <tooltip>Dimension Columns can be added here</tooltip>
+      <display-name>Y</display-name>
+      <encoding-icon token="letter-y" />
+      <tooltip>Y Rows can be added here</tooltip>
     </encoding>
   </worksheet-extension>
   <resources>
