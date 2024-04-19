@@ -1,9 +1,10 @@
 import Game from "../Game";
 import * as d3 from "d3";
-import { Direction, Food, Frame, Renderer } from "../types";
+import { Food, Frame, Renderer } from "../types";
 import { EyeElm } from "../Snake";
 
 type D3Selecion = d3.Selection<SVGSVGElement, unknown, HTMLElement, any>;
+type D3Selected = d3.Selection<d3.BaseType, Food, d3.BaseType, unknown>;
 
 const FOOD_RATIO = 1.75;
 
@@ -186,30 +187,8 @@ class D3Renderer implements Renderer {
 		const groupFood = this.d3.append("g");
 		groupFood.attr("class", "food-group");
 
-		// Food shadow/gradient
-		groupFood
-			.selectAll("dot")
-			.data(game.food)
-			.join("rect")
-			.attr(
-				"x",
-				(food: Food) => this.x(food.x) - (this.snakeFoodSize * 1.15) / 2,
-			)
-			.attr("y", (food: Food) => this.y(food.y))
-			.attr("width", this.snakeFoodSize * 1.15)
-			.attr("height", this.snakeFoodSize * 6)
-			.attr("fill", "url(#food-shadow)")
-			.attr("class", "food-shadow");
-
 		// Food circle
-		groupFood
-			.selectAll("dot")
-			.data(game.food)
-			.join("circle")
-			.attr("cx", (food: Food) => this.x(food.x))
-			.attr("cy", (food: Food) => this.y(food.y))
-			.attr("r", this.snakeFoodSize / FOOD_RATIO)
-			.attr("class", "food");
+		this.drawFood(groupFood.selectAll("g.food-elm").data(game.food));
 	}
 
 	render(frame: Frame) {
@@ -255,15 +234,54 @@ class D3Renderer implements Renderer {
 
 		// check which items should be removed
 		const groupFood = this.d3.select(".food-group");
-		groupFood
-			.selectAll("circle")
-			.data(frame.food)
-			.join("circle")
+		this.drawFood(groupFood.selectAll("g.food-elm").data(frame.food));
+	}
+
+	drawFood(groupFood: D3Selected) {
+		const food = groupFood.join("g").attr("class", "food-elm");
+
+		// Shadows
+		food
+			.append("rect")
+			.attr(
+				"x",
+				(food: Food) => this.x(food.x) - (this.snakeFoodSize * 1.15) / 2,
+			)
+			.attr("y", (food: Food) => this.y(food.y))
+			.attr("width", this.snakeFoodSize * 1.15)
+			.attr("height", this.snakeFoodSize * 6)
+			.attr("fill", "url(#food-shadow)")
+			.attr("class", "food-shadow");
+
+		// Food items
+		food
+			.append("circle")
 			.attr("cx", (food: Food) => this.x(food.x))
 			.attr("cy", (food: Food) => this.y(food.y))
 			.attr("id", (food: Food) => `food_${food.x}_${food.y}`)
 			.attr("r", this.snakeFoodSize / FOOD_RATIO)
-			.attr("class", "food");
+			.attr("class", "food")
+			.on("mousemove", (e) => {
+				const self = d3.select(e.target);
+				const food = self.data()[0] as Food;
+
+				this.game?.hoverDatapoint(food, e.clientX, e.clientY);
+			})
+			.on("mouseout", (e) => {
+				const self = d3.select(e.target);
+				const food = self.data()[0] as Food;
+
+				this.game?.hoverOut(food);
+			});
+	}
+
+	// When a datapoint in the chart has been hovered
+	hoverDatapoint(_: Food, _1: number, _2: number) {
+		//
+	}
+
+	hoverOut(_: Food) {
+		//
 	}
 }
 

@@ -4,6 +4,8 @@ import { SomeSnake } from "../Snake";
 export interface Renderer {
 	init: (game: Game) => void;
 	render: (frame: Frame) => void;
+	hoverDatapoint: (food: Food, x: number, y: number) => void;
+	hoverOut: (food: Food) => void;
 }
 
 export type Some<T> = T | undefined;
@@ -11,12 +13,14 @@ export type Some<T> = T | undefined;
 export type Path = [number, number];
 
 export class Food {
+	i: number = 0;
 	x: number = 0;
 	y: number = 0;
 
-	constructor(x: number, y: number) {
+	constructor(x: number, y: number, rowIndex: number) {
 		this.x = Math.round(x);
 		this.y = Math.round(y);
+		this.i = rowIndex;
 	}
 }
 

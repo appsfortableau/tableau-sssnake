@@ -148,7 +148,7 @@ export default class Game {
 		const snake: SomeSnake = this.snake ? this.snake : undefined;
 		const food: Food[] = Object.assign([], this.food);
 
-		console.log(food, 'fooooooooood');
+		console.log(food, "fooooooooood");
 		const frame = new Frame(timestamp, snake, food);
 		frame.score = this.score;
 		frame.level = this.level;
@@ -162,6 +162,16 @@ export default class Game {
 
 		this.engines.forEach((engine: Renderer) => engine.render(frame));
 		this.lastFrame = frame;
+	}
+
+	hoverDatapoint(food: Food, x: number, y: number) {
+		this.engines.forEach((engine: Renderer) =>
+			engine.hoverDatapoint(food, x, y),
+		);
+	}
+
+	hoverOut(food: Food) {
+		this.engines.forEach((engine: Renderer) => engine.hoverOut(food));
 	}
 
 	updateFrame(_: number, dir: Direction) {
@@ -261,7 +271,7 @@ export default class Game {
 			const y = Math.floor(Math.random() * this.size[1]);
 
 			if (!exclude.includes(JSON.stringify([x, y]))) {
-				food.push(new Food(x, y));
+				food.push(new Food(x, y, food.length));
 				break;
 			}
 		}

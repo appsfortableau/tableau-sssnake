@@ -25,15 +25,15 @@ import { Tableau } from "./types/extensions-api-types";
 			tabl.initTableau();
 
 			// game.setSize(32, 32);
-			game.addSnake(new Snake(2, 5, 3, Direction.UP));
-
-			// set data/food
-			game.setData([
-				new Food(32 * 0.6, 32 * 0.5),
-				new Food(32 * 0.1, 32 * 0.8),
-				new Food(32 * 0.87, 32 * 0.9),
-				new Food(32 * 0.81, 32 * 0.95),
-			]);
+			// game.addSnake(new Snake(2, 5, 3, Direction.UP));
+			//
+			// // set data/food
+			// game.setData([
+			// 	new Food(32 * 0.6, 32 * 0.5, 0),
+			// 	new Food(32 * 0.1, 32 * 0.8, 1),
+			// 	new Food(32 * 0.87, 32 * 0.9, 2),
+			// 	new Food(32 * 0.81, 32 * 0.95, 3),
+			// ]);
 
 			// must be done before rendering, so the engines are initialized
 			// with the first set of settings/configuration.

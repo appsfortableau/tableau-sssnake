@@ -4,13 +4,10 @@ import {
 	Column,
 	DataValue,
 	Encoding,
-	Field,
 	FieldInstance,
 	Parameter,
 	SummaryDataChangedEvent,
 	Tableau,
-	TableauEvent,
-	VisualSpecification,
 	Worksheet,
 } from "../types/extensions-api-types";
 
@@ -106,15 +103,17 @@ class TableauRenderer implements Renderer {
 			)?.index || 0;
 
 		// Fixed data setup
-		const data = dataTablePage.data.map((row: DataValue[]) => {
+		const data = dataTablePage.data.map((row: DataValue[], index: number) => {
 			const x = row[axisXIndex].nativeValue;
 			const y = row[axisYIndex].nativeValue;
 
 			if (x > maxX) maxX = x;
 			if (y > maxY) maxY = y;
 
-			return new Food(x, y);
+			return new Food(x, y, index);
 		});
+
+		console.log("SET NEW TABLEU DATA", data);
 
 		await dt?.releaseAsync();
 
@@ -149,6 +148,21 @@ class TableauRenderer implements Renderer {
 
 	createState(...state: (string | number)[]): string {
 		return state.join(this.seperator);
+	}
+
+	// When a datapoint in the chart has been hovered
+	hoverDatapoint(food: Food, x: number, y: number) {
+		// hoverDatapoint
+		this.worksheet
+			?.hoverTupleAsync(food.i + 1, {
+				tooltipAnchorPoint: { x, y },
+			})
+			.then(() => console.log("Done"))
+			.catch((error) => console.log("Failed to hover because of: ", error));
+	}
+
+	hoverOut(_: Food) {
+		this.worksheet?.hoverTupleAsync(0);
 	}
 }
 
