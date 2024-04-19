@@ -1,6 +1,8 @@
 import Game from "../Game";
 import { Food, Frame, Renderer, Some } from "../types";
 import {
+	Column,
+	DataValue,
 	Encoding,
 	Field,
 	FieldInstance,
@@ -45,60 +47,81 @@ class TableauRenderer implements Renderer {
 
 		this.worksheet?.addEventListener(
 			this.tableau.TableauEventType.SummaryDataChanged,
-			async (e: SummaryDataChangedEvent): Promise<void> => {
-				this.axisX = undefined;
-				this.axisY = undefined;
-				const encodings = await getWorksheetEncodings(e.worksheet);
-				encodings.forEach((encode: Encoding) => {
-					if (encode.id === "axis_x") {
-						this.axisX = encode.field;
-					} else if (encode.id === "axis_y") {
-						this.axisY = encode.field;
-					}
-				});
-
-				if (this.axisX && this.axisY) {
-					this.queryDataFromWorksheet();
-
-					// WE ARE ALLOWED TO VIEW THE GRAPH
-				} else {
-					// WE SHOULD SHOW A MESSAGE THAT WE ARE MISSING SOME STUFF...
-				}
-				console.log("encodings are changing?", encodings);
-			},
+			async (e: SummaryDataChangedEvent): Promise<void> =>
+				this.initData(e.worksheet),
 		);
 
 		if (this.worksheet) {
+			this.initData(this.worksheet);
 			console.log("encodings", await getWorksheetEncodings(this.worksheet));
 		}
 	}
 
+	async initData(worksheet: Worksheet) {
+		// reset axis's
+		this.axisX = undefined;
+		this.axisY = undefined;
+
+		const encodings = await getWorksheetEncodings(worksheet);
+		encodings.forEach((encode: Encoding) => {
+			if (encode.id === "axis_x") {
+				this.axisX = encode.field;
+			} else if (encode.id === "axis_y") {
+				this.axisY = encode.field;
+			}
+		});
+
+		console.log("axis", this.axisX, this.axisY);
+
+		if (this.axisX && this.axisY) {
+			// WE ARE ALLOWED TO VIEW THE GRAPH
+			this.queryDataFromWorksheet();
+		} else {
+			// WE SHOULD SHOW A MESSAGE THAT WE ARE MISSING SOME STUFF...
+		}
+
+		console.log("encodings are changing?", encodings);
+	}
+
 	async queryDataFromWorksheet() {
-		const dt = await this.worksheet?.getSummaryDataReaderAsync();
+		const pageSize = 1000;
+		const dt = await this.worksheet?.getSummaryDataReaderAsync(pageSize);
 		if (!dt) {
 			console.log("WE ARE FAILURES");
 			return;
 		}
-		const pageCount = dt?.pageCount || 0;
 
-		const maxX = 32,
+		let maxX = 32,
 			maxY = 32;
-		const data: Food[] = [];
 
-		for (let currentPage = 0; currentPage < pageCount; currentPage++) {
-			const dataTablePage = await dt?.getPageAsync(currentPage);
-			console.log(dataTablePage);
-			// TODO: HELP SRI, FIX ME!
-		}
+		const dataTablePage = await dt?.getPageAsync(0);
+		// init axis indexes
+		const axisYIndex =
+			dataTablePage.columns.find(
+				(col: Column) => col.fieldId === this.axisY?.fieldId,
+			)?.index || 0;
+		const axisXIndex =
+			dataTablePage.columns.find(
+				(col: Column) => col.fieldId === this.axisX?.fieldId,
+			)?.index || 0;
+
+		// Fixed data setup
+		const data = dataTablePage.data.map((row: DataValue[]) => {
+			const x = row[axisXIndex].nativeValue;
+			const y = row[axisYIndex].nativeValue;
+
+			if (x > maxX) maxX = x;
+			if (y > maxY) maxY = y;
+
+			return new Food(x, y);
+		});
+
 		await dt?.releaseAsync();
 
-		// [
-		// 	new Food(32 * 0.6, 32 * 0.5),
-		// 	new Food(32 * 0.1, 32 * 0.8),
-		// 	new Food(32 * 0.87, 32 * 0.9),
-		// 	new Food(32 * 0.81, 32 * 0.95),
-		// ]
-		this.game?.setSize(maxX, maxY);
+		// to make the game/chart a square
+		const size = maxX > maxY ? maxX : maxY;
+
+		this.game?.setSize(size, size);
 		this.game?.setData(data);
 
 		// what if we are in a game????
