@@ -48,8 +48,10 @@ class TableauRenderer implements Renderer {
 
 		this.worksheet?.addEventListener(
 			this.tableau.TableauEventType.SummaryDataChanged,
-			async (e: SummaryDataChangedEvent): Promise<void> =>
-				this.initData(e.worksheet),
+			async (e: SummaryDataChangedEvent): Promise<void> => {
+				console.log("trigger summary data");
+				this.initData(e.worksheet);
+			},
 		);
 
 		if (this.worksheet) {
