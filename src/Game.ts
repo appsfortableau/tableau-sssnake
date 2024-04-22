@@ -148,7 +148,6 @@ export default class Game {
 		const snake: SomeSnake = this.snake ? this.snake : undefined;
 		const food: Food[] = Object.assign([], this.food);
 
-		console.log(food, "fooooooooood");
 		const frame = new Frame(timestamp, snake, food);
 		frame.score = this.score;
 		frame.level = this.level;

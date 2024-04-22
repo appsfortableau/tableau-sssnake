@@ -78,7 +78,6 @@ body {
   .food-group {
     .food {
       position: relative;
-      fill: var(--food);
     }
   }
 }

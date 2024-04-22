@@ -16,6 +16,7 @@ export class Food {
 	i: number = 0;
 	x: number = 0;
 	y: number = 0;
+	color: string = "#FB8B24";
 
 	constructor(x: number, y: number, rowIndex: number) {
 		this.x = Math.round(x);

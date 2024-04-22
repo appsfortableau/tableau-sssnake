@@ -29,8 +29,12 @@ class TableauRenderer implements Renderer {
 	tableau: Tableau;
 	worksheet: Some<Worksheet>;
 	paramState: Some<Parameter>;
-	axisX: Some<FieldInstance>;
-	axisY: Some<FieldInstance>;
+	xField: Some<FieldInstance>;
+	yField: Some<FieldInstance>;
+	colorField: Some<FieldInstance>;
+
+	// predefined colors map
+	colors: string[] = ["#FB8B24", "#04A777", "#016FB9", "#E2E8DD"];
 
 	constructor(t: Tableau) {
 		this.tableau = t;
@@ -56,21 +60,21 @@ class TableauRenderer implements Renderer {
 
 	async initData(worksheet: Worksheet) {
 		// reset axis's
-		this.axisX = undefined;
-		this.axisY = undefined;
+		this.xField = undefined;
+		this.yField = undefined;
 
 		const encodings = await getWorksheetEncodings(worksheet);
 		encodings.forEach((encode: Encoding) => {
 			if (encode.id === "axis_x") {
-				this.axisX = encode.field;
+				this.xField = encode.field;
 			} else if (encode.id === "axis_y") {
-				this.axisY = encode.field;
+				this.yField = encode.field;
+			} else if (encode.id === "color") {
+				this.colorField = encode.field;
 			}
 		});
 
-		console.log("axis", this.axisX, this.axisY);
-
-		if (this.axisX && this.axisY) {
+		if (this.xField && this.yField) {
 			// WE ARE ALLOWED TO VIEW THE GRAPH
 			this.queryDataFromWorksheet();
 		} else {
@@ -88,6 +92,7 @@ class TableauRenderer implements Renderer {
 			return;
 		}
 
+		// minimal state
 		let maxX = 32,
 			maxY = 32;
 
@@ -95,12 +100,20 @@ class TableauRenderer implements Renderer {
 		// init axis indexes
 		const axisYIndex =
 			dataTablePage.columns.find(
-				(col: Column) => col.fieldId === this.axisY?.fieldId,
+				(col: Column) => col.fieldId === this.yField?.fieldId,
 			)?.index || 0;
 		const axisXIndex =
 			dataTablePage.columns.find(
-				(col: Column) => col.fieldId === this.axisX?.fieldId,
+				(col: Column) => col.fieldId === this.xField?.fieldId,
 			)?.index || 0;
+
+		const colorIndex = dataTablePage.columns.find(
+			(col: Column) => col.fieldId === this.colorField?.fieldId,
+		)?.index;
+
+		console.log(colorIndex, dataTablePage.columns, this.colorField);
+
+		const colors: { [color: string]: number } = {};
 
 		// Fixed data setup
 		const data = dataTablePage.data.map((row: DataValue[], index: number) => {
@@ -110,10 +123,23 @@ class TableauRenderer implements Renderer {
 			if (x > maxX) maxX = x;
 			if (y > maxY) maxY = y;
 
-			return new Food(x, y, index);
-		});
+			// create new datapoint for scatterplot
+			const f = new Food(x, y, index);
 
-		console.log("SET NEW TABLEU DATA", data);
+			// do we have a colorindex?
+			if (colorIndex !== undefined) {
+				const c = row[colorIndex].nativeValue;
+
+				if (!colors[c]) {
+					// get a color from the predefined colors
+					colors[c] = this.colors[Object.keys(colors).length];
+				}
+
+				f.color = colors[c];
+			}
+
+			return f;
+		});
 
 		await dt?.releaseAsync();
 

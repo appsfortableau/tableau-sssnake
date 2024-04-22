@@ -26,6 +26,12 @@
       <encoding-icon token="letter-y" />
       <tooltip>Y Rows can be added here</tooltip>
     </encoding>
+    <encoding id="color">
+      <display-name>Color</display-name>
+      <fields max-count="1" />
+      <encoding-icon token="color" />
+      <tooltip>Color of the groups</tooltip>
+    </encoding>
   </worksheet-extension>
   <resources>
     <resource id="name">

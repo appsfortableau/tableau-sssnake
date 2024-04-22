@@ -240,18 +240,18 @@ class D3Renderer implements Renderer {
 	drawFood(groupFood: D3Selected) {
 		const food = groupFood.join("g").attr("class", "food-elm");
 
-		// Shadows
-		food
-			.append("rect")
-			.attr(
-				"x",
-				(food: Food) => this.x(food.x) - (this.snakeFoodSize * 1.15) / 2,
-			)
-			.attr("y", (food: Food) => this.y(food.y))
-			.attr("width", this.snakeFoodSize * 1.15)
-			.attr("height", this.snakeFoodSize * 6)
-			.attr("fill", "url(#food-shadow)")
-			.attr("class", "food-shadow");
+		// // Shadows
+		// food
+		// 	.append("rect")
+		// 	.attr(
+		// 		"x",
+		// 		(food: Food) => this.x(food.x) - (this.snakeFoodSize * 1.15) / 2,
+		// 	)
+		// 	.attr("y", (food: Food) => this.y(food.y))
+		// 	.attr("width", this.snakeFoodSize * 1.15)
+		// 	.attr("height", this.snakeFoodSize * 6)
+		// 	.attr("fill", "url(#food-shadow)")
+		// 	.attr("class", "food-shadow");
 
 		// Food items
 		food
@@ -261,6 +261,10 @@ class D3Renderer implements Renderer {
 			.attr("id", (food: Food) => `food_${food.x}_${food.y}`)
 			.attr("r", this.snakeFoodSize / FOOD_RATIO)
 			.attr("class", "food")
+			.attr("fill", (food: Food) => {
+				console.log(food);
+				return food.color
+			})
 			.on("mousemove", (e) => {
 				const self = d3.select(e.target);
 				const food = self.data()[0] as Food;
