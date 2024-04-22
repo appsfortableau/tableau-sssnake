@@ -234,6 +234,7 @@ class D3Renderer implements Renderer {
 
 		// check which items should be removed
 		const groupFood = this.d3.select(".food-group");
+		groupFood.selectAll("g.food-elm").remove();
 		this.drawFood(groupFood.selectAll("g.food-elm").data(frame.food));
 	}
 
@@ -261,10 +262,7 @@ class D3Renderer implements Renderer {
 			.attr("id", (food: Food) => `food_${food.x}_${food.y}`)
 			.attr("r", this.snakeFoodSize / FOOD_RATIO)
 			.attr("class", "food")
-			.attr("fill", (food: Food) => {
-				console.log(food);
-				return food.color
-			})
+			.attr("fill", (food: Food) => food.color)
 			.on("mousemove", (e) => {
 				const self = d3.select(e.target);
 				const food = self.data()[0] as Food;
