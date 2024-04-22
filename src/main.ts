@@ -19,7 +19,26 @@ import { Tableau } from "./types/extensions-api-types";
 
 	const game = new Game([d3, tabl]);
 
-	tableau.extensions.initializeAsync({ configure: configure }).then(
+	if (!tableau.extensions.worksheetContent) {
+			game.setSize(32, 32);
+			game.addSnake(new Snake(2, 5, 3, Direction.UP));
+
+			// set data/food
+			game.setData([
+				new Food(32 * 0.6, 32 * 0.5, 0),
+				new Food(32 * 0.1, 32 * 0.8, 1),
+				new Food(32 * 0.87, 32 * 0.9, 2),
+				new Food(32 * 0.81, 32 * 0.95, 3),
+			]);
+
+			game.initEngines();
+
+			// Render only the first frame, and do not start the game
+			game.runFrame(new Date().getTime());
+		return;
+	}
+
+	tableau.extensions.initializeAsync({ configure }).then(
 		() => {
 			console.log(tableau);
 			tabl.initTableau();

@@ -35,19 +35,15 @@ class D3Renderer implements Renderer {
 		this.container = document.getElementById("game");
 
 		// set the dimensions and margins of the graph
-		this.margins = { top: 0, right: 0, bottom: 25, left: 25 };
 		const size = this.getSize();
-
-		const graphWidth = size + this.margins.left + this.margins.right;
-		const graphHeight = size + this.margins.top + this.margins.bottom;
 
 		// append the svg object to the body of the page
 		this.d3 = d3
 			.select("#game")
 			.append("svg")
 			.attr("class", "game-svg")
-			.attr("width", graphWidth)
-			.attr("height", graphHeight)
+			.attr("width", size)
+			.attr("height", size)
 			.attr("viewBox", `0 0 ${size} ${size}`);
 
 		this.d3.append("defs").html(`
@@ -60,16 +56,13 @@ class D3Renderer implements Renderer {
 		window.addEventListener("resize", () => {
 			const size = this.getSize();
 
-			const graphWidth = size + this.margins.left + this.margins.right;
-			const graphHeight = size + this.margins.top + this.margins.bottom;
-
-			this.d3.attr("width", graphWidth).attr("height", graphHeight);
+			this.d3.attr("width", size).attr("height", size);
 		});
 	}
 
 	getSize(): number {
-		const windowWidth = Math.round(this.container?.offsetWidth || 1024);
-		const windowHeight = Math.round(this.container?.offsetHeight || 756);
+		const windowWidth = Math.round(window.innerWidth * 0.95);
+		const windowHeight = Math.round(window.innerHeight * 0.95);
 
 		return windowHeight > windowWidth ? windowWidth : windowHeight;
 	}
@@ -83,18 +76,10 @@ class D3Renderer implements Renderer {
 
 		this.snakeFoodSize = Math.round(size / game.size[0] / 2);
 
-		const offsetX = this.margins.left + this.margins.right;
-		const offsetY = this.margins.top + this.margins.bottom;
 		// Add X axis
-		this.x = d3
-			.scaleLinear()
-			.domain([0, gridX])
-			.range([0, size - offsetX]);
+		this.x = d3.scaleLinear().domain([0, gridX]).range([0, size]);
 
-		this.y = d3
-			.scaleLinear()
-			.domain([0, gridY])
-			.range([size - offsetY, 0]);
+		this.y = d3.scaleLinear().domain([0, gridY]).range([size, 0]);
 
 		const axis = this.d3.append("g");
 		axis.attr("class", "axis-group");
@@ -102,13 +87,13 @@ class D3Renderer implements Renderer {
 		// Add X axis
 		axis
 			.append("g")
-			.attr("transform", `translate(0, ${size - offsetY})`)
+			.attr("transform", `translate(0, ${size})`)
 			.attr("class", "x-axis")
 			.call(
 				d3
 					.axisBottom(this.x)
 					.ticks(game.size[0])
-					.tickSize(-(size - offsetX)),
+					.tickSize(-size),
 			)
 			.selectAll(".tick text")
 			.attr("transform", "translate(0, 5)");
@@ -124,7 +109,7 @@ class D3Renderer implements Renderer {
 					.tickFormat((x: number): string | null =>
 						x === 0 ? null : x.toString(),
 					)
-					.tickSize(-(size - offsetY)),
+					.tickSize(-size),
 				0,
 			)
 			.selectAll(".tick text")
