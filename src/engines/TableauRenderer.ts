@@ -1,5 +1,6 @@
 import Game from "../libs/Game";
-import { Food, Frame, Renderer, Some } from "../types";
+import Snake from "../libs/Snake";
+import { Food, Frame, Renderer, Some, Direction } from "../types";
 import {
 	Column,
 	DataTable,
@@ -150,6 +151,12 @@ class TableauRenderer implements Renderer {
 
 		this.game?.setSize(size, size);
 		this.game?.setData(data);
+
+		console.log(colorIndex !== undefined, Object.keys(colors).length === 1);
+		if (colorIndex !== undefined && Object.keys(colors).length === 1) {
+			console.log('SNAKEY SNAKEY')
+			this.game?.addSnake(new Snake(2, 5, 3, Direction.UP));
+		}
 
 		// what if we are in a game????
 		// this.game?.runFrame(new Date().getTime());

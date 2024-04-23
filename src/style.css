@@ -50,6 +50,11 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+
+  .error {
+    color: #af0000;
+  }
+
   .game-svg {
     aspect-ratio: 1/1;
     border: 1px solid var(--secondary-line);

@@ -159,8 +159,6 @@ export default class Game {
 			snake.dir = frame.direction;
 		}
 
-		console.log(frame)
-
 		this.engines.forEach((engine: Renderer) => engine.render(frame));
 		this.lastFrame = frame;
 	}
