@@ -205,6 +205,15 @@ class D3Renderer implements Renderer {
 		if (frame.snake) {
 			const snakePath = frame.snake.path;
 			const snake = this.d3.select(".snake");
+
+			if (snake.select("path").size() === 0) {
+				snake
+					.append("path")
+					.attr("stroke-width", this.snakeFoodSize)
+					.attr("class", "snake-body");
+				snake.append("g").attr("class", "snake-eyes");
+			}
+
 			snake
 				.select("path")
 				.datum(frame.snake.path)
@@ -241,6 +250,7 @@ class D3Renderer implements Renderer {
 		// check which items should be removed
 		const groupFood = this.d3.select(".food-group");
 		groupFood.selectAll("g.food-elm").remove();
+
 		this.drawFood(groupFood.selectAll("g.food-elm").data(frame.food));
 	}
 
