@@ -1,4 +1,4 @@
-import { Direction, Path } from "./types";
+import { Direction, Path } from "../types";
 
 export type SomeSnake = Snake | undefined;
 

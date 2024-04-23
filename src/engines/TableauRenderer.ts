@@ -1,7 +1,8 @@
-import Game from "../Game";
+import Game from "../libs/Game";
 import { Food, Frame, Renderer, Some } from "../types";
 import {
 	Column,
+	DataTable,
 	DataValue,
 	Encoding,
 	FieldInstance,
@@ -39,25 +40,26 @@ class TableauRenderer implements Renderer {
 	constructor(t: Tableau) {
 		this.tableau = t;
 		this.worksheet = t.extensions.worksheetContent?.worksheet;
+		this.initTableau();
 	}
 
 	async initTableau() {
-		this.worksheet = this.tableau.extensions.worksheetContent?.worksheet;
+		// this.worksheet = this.tableau.extensions.worksheetContent?.worksheet;
 
 		this.paramState = await this.worksheet?.findParameterAsync("state");
 
-		this.worksheet?.addEventListener(
-			this.tableau.TableauEventType.SummaryDataChanged,
-			async (e: SummaryDataChangedEvent): Promise<void> => {
-				console.log("trigger summary data");
-				this.initData(e.worksheet);
-			},
-		);
-
-		if (this.worksheet) {
-			this.initData(this.worksheet);
-			console.log("encodings", await getWorksheetEncodings(this.worksheet));
-		}
+		// this.worksheet?.addEventListener(
+		// 	this.tableau.TableauEventType.SummaryDataChanged,
+		// 	async (e: SummaryDataChangedEvent): Promise<void> => {
+		// 		console.log("trigger summary data");
+		// 		this.initData(e.worksheet);
+		// 	},
+		// );
+		//
+		// if (this.worksheet) {
+		// 	this.initData(this.worksheet);
+		// 	console.log("encodings", await getWorksheetEncodings(this.worksheet));
+		// }
 	}
 
 	async initData(worksheet: Worksheet) {
@@ -78,17 +80,17 @@ class TableauRenderer implements Renderer {
 
 		if (this.xField && this.yField) {
 			// WE ARE ALLOWED TO VIEW THE GRAPH
-			this.queryDataFromWorksheet();
+			await this.queryDataFromWorksheet();
 		} else {
 			// WE SHOULD SHOW A MESSAGE THAT WE ARE MISSING SOME STUFF...
 		}
-
-		console.log("encodings are changing?", encodings);
 	}
 
 	async queryDataFromWorksheet() {
-		const pageSize = 1000;
-		const dt = await this.worksheet?.getSummaryDataReaderAsync(pageSize);
+		console.log("query data");
+		const dt = await this.worksheet?.getSummaryDataReaderAsync(undefined, {
+			ignoreSelection: true,
+		});
 		if (!dt) {
 			console.log("WE ARE FAILURES");
 			return;
@@ -98,27 +100,27 @@ class TableauRenderer implements Renderer {
 		let maxX = 32,
 			maxY = 32;
 
-		const dataTablePage = await dt?.getPageAsync(0);
+		const dataTable = await dt?.getAllPagesAsync();
+		await dt?.releaseAsync();
+
 		// init axis indexes
 		const axisYIndex =
-			dataTablePage.columns.find(
+			dataTable.columns.find(
 				(col: Column) => col.fieldId === this.yField?.fieldId,
 			)?.index || 0;
 		const axisXIndex =
-			dataTablePage.columns.find(
+			dataTable.columns.find(
 				(col: Column) => col.fieldId === this.xField?.fieldId,
 			)?.index || 0;
 
-		const colorIndex = dataTablePage.columns.find(
+		const colorIndex = dataTable.columns.find(
 			(col: Column) => col.fieldId === this.colorField?.fieldId,
 		)?.index;
-
-		console.log(colorIndex, dataTablePage.columns, this.colorField);
 
 		const colors: { [color: string]: number } = {};
 
 		// Fixed data setup
-		const data = dataTablePage.data.map((row: DataValue[], index: number) => {
+		const data = dataTable.data.map((row: DataValue[], index: number) => {
 			const x = row[axisXIndex].nativeValue;
 			const y = row[axisYIndex].nativeValue;
 
@@ -143,8 +145,6 @@ class TableauRenderer implements Renderer {
 			return f;
 		});
 
-		await dt?.releaseAsync();
-
 		// to make the game/chart a square
 		const size = maxX > maxY ? maxX : maxY;
 
@@ -152,12 +152,13 @@ class TableauRenderer implements Renderer {
 		this.game?.setData(data);
 
 		// what if we are in a game????
-		this.game?.runFrame(new Date().getTime());
+		// this.game?.runFrame(new Date().getTime());
 		// game mode like:
 		// this.game?.start();
 	}
 
 	init(game: Game) {
+		console.log("init enigne");
 		this.game = game;
 	}
 

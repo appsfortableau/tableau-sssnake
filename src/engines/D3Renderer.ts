@@ -1,7 +1,8 @@
-import Game from "../Game";
+import Game from "../libs/Game";
 import * as d3 from "d3";
 import { Food, Frame, Renderer } from "../types";
-import { EyeElm } from "../Snake";
+import { EyeElm } from "../libs/Snake";
+import { HoverDatapointCallback, ClickDatapointCallback } from "../Demo";
 
 type D3Selecion = d3.Selection<SVGSVGElement, unknown, HTMLElement, any>;
 type D3Selected = d3.Selection<d3.BaseType, Food, d3.BaseType, unknown>;
@@ -30,12 +31,19 @@ class D3Renderer implements Renderer {
 
 	// default size
 	snakeFoodSize: number = 10;
+	//@ts-ignore
+	onHoverCb: HoverDatapointCallback;
+	onClickCb: ClickDatapointCallback;
+	selection: number[] = [];
 
 	constructor() {
 		this.container = document.getElementById("game");
+	}
 
+	buildSvg() {
 		// set the dimensions and margins of the graph
 		const size = this.getSize();
+		d3.select("#game > *").remove();
 
 		// append the svg object to the body of the page
 		this.d3 = d3
@@ -51,6 +59,17 @@ class D3Renderer implements Renderer {
 					<stop stop-color="#FB8B24" stop-opacity="0.5"/>
 					<stop offset="1" stop-color="#FB8B24" stop-opacity="0"/>
 				</linearGradient>
+
+				<filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+					<feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blur"/>
+					<feOffset in="blur" dx="0" dy="0" result="offsetBlur"/>
+					<feFlood flood-color="red" result="color"/>
+					<feComposite in="color" in2="offsetBlur" operator="in" result="shadow"/>
+					<feMerge>
+						<feMergeNode in="shadow"/>
+						<feMergeNode in="SourceGraphic"/>
+					</feMerge>
+				</filter>
 			`);
 
 		window.addEventListener("resize", () => {
@@ -61,14 +80,16 @@ class D3Renderer implements Renderer {
 	}
 
 	getSize(): number {
-		const windowWidth = Math.round(window.innerWidth * 0.95);
-		const windowHeight = Math.round(window.innerHeight * 0.95);
+		const windowWidth = Math.round(window.innerWidth * 0.9);
+		const windowHeight = Math.round(window.innerHeight * 0.9);
 
 		return windowHeight > windowWidth ? windowWidth : windowHeight;
 	}
 
 	init(game: Game) {
 		this.game = game;
+
+		this.buildSvg();
 
 		const gridX = this.game.size[0];
 		const gridY = this.game.size[1];
@@ -224,7 +245,10 @@ class D3Renderer implements Renderer {
 	}
 
 	drawFood(groupFood: D3Selected) {
-		const food = groupFood.join("g").attr("class", "food-elm");
+		const food = groupFood
+			.join("g")
+			.attr("class", "food-elm")
+			.attr("data-tuple", (food: Food) => food.i + 1);
 
 		// // Shadows
 		// food
@@ -247,19 +271,81 @@ class D3Renderer implements Renderer {
 			.attr("id", (food: Food) => `food_${food.x}_${food.y}`)
 			.attr("r", this.snakeFoodSize / FOOD_RATIO)
 			.attr("class", "food")
-			.attr("fill", (food: Food) => food.color)
+			.attr("style", (food: Food) => `--fill-color: ${food.color}`)
+			// .attr("fill", (food: Food) => food.color)
 			.on("mousemove", (e) => {
 				const self = d3.select(e.target);
 				const food = self.data()[0] as Food;
 
-				this.game?.hoverDatapoint(food, e.clientX, e.clientY);
+				this.onHoverCb && this.onHoverCb(food, e.clientX, e.clientY);
+				// this.game?.hoverDatapoint(food, e.clientX, e.clientY);
 			})
 			.on("mouseout", (e) => {
 				const self = d3.select(e.target);
 				const food = self.data()[0] as Food;
 
 				this.game?.hoverOut(food);
+			})
+			.on("click", (e: MouseEvent) => {
+				const self = d3.select(e.target);
+				const food = self.data()[0] as Food;
+
+				this.d3.selectAll(".food-elm.active").classed("active", false);
+
+				const tupleId = food.i + 1;
+				this.toggleSelection(tupleId, e);
+
+				// highlight the active onces!
+				this.selection.forEach((tuple: number) => {
+					this.d3
+						.select(`.food-elm[data-tuple='${tuple}']`)
+						.classed("active", true);
+				});
+
+				console.log(this.selection);
+
+				this.d3
+					.select(".food-group")
+					.classed("has-selection", this.selection.length > 0);
+
+				this.onClickCb && this.onClickCb(food, e);
 			});
+	}
+
+	onHover(cb: HoverDatapointCallback) {
+		this.onHoverCb = cb;
+	}
+
+	onClick(cb: ClickDatapointCallback) {
+		this.onClickCb = cb;
+	}
+
+	toggleSelection(tupleId: number, mouseEvent: MouseEvent): number[] {
+		const ctrlKeyPressed =
+			!!mouseEvent.ctrlKey || !!mouseEvent.shiftKey || mouseEvent.metaKey;
+		const option = ctrlKeyPressed
+			? tableau.SelectOptions.Toggle
+			: tableau.SelectOptions.Simple;
+
+		switch (option) {
+			case tableau.SelectOptions.Toggle:
+				if (this.selection.includes(tupleId)) {
+					const i = this.selection.findIndex((x: number) => x === tupleId);
+					this.selection.splice(i, 1);
+				} else {
+					this.selection.push(tupleId);
+				}
+				break;
+			case tableau.SelectOptions.Simple:
+				if (this.selection.includes(tupleId) && this.selection.length === 1) {
+					this.selection = [];
+				} else {
+					this.selection = [tupleId];
+				}
+				break;
+		}
+
+		return this.selection;
 	}
 
 	// When a datapoint in the chart has been hovered

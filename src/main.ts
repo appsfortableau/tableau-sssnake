@@ -1,77 +1,79 @@
 import "./style.css";
 
-import Game from "./Game";
-import D3Renderer from "./engines/D3Renderer";
-import TableauRenderer from "./engines/TableauRenderer";
-import { Direction, Food } from "./types";
-import Snake from "./Snake";
-import { Tableau } from "./types/extensions-api-types";
+import {
+	Column,
+	FilterChangedEvent,
+	Tableau,
+} from "./types/extensions-api-types";
+import D3Scatterplot from "./Demo";
 
-((tableau: Tableau) => {
-	function configure() {
-		console.log("Open configurer");
+(async (tableau: Tableau) => {
+	console.log("[Tableau] Loading web app...");
+
+	await tableau.extensions.initializeAsync();
+
+	// our D3 Scatterplot builder.
+	const scatter = new D3Scatterplot();
+	const events = tableau.TableauEventType;
+	const worksheet = tableau.extensions.worksheetContent?.worksheet;
+
+	// Listen for when the data has changed.
+	async function summaryDataEvent() {
+		// Connect with Tableau via Extensions API and fetch a summary of data.
+		const dataTableReader = await worksheet.getSummaryDataReaderAsync();
+		const dataTable = await dataTableReader.getAllPagesAsync();
+		await dataTableReader.releaseAsync();
+
+		console.log(
+			"[Tableau] Columns:",
+			dataTable.columns.map((t: Column) => t.fieldName).join(", "),
+		);
+		console.log("[Tableau] Total rows found:", dataTable.totalRowCount);
+
+		// give the function the worksheet to handle columns
+		await scatter.setDataForD3(worksheet, dataTable);
+		await scatter.render();
 	}
-
-	console.log(tableau);
-
-	const d3 = new D3Renderer();
-	const tabl = new TableauRenderer(tableau);
-
-	const game = new Game([d3, tabl]);
-
-	if (!tableau.extensions.worksheetContent) {
-			game.setSize(32, 32);
-			game.addSnake(new Snake(2, 5, 3, Direction.UP));
-
-			// set data/food
-			game.setData([
-				new Food(32 * 0.6, 32 * 0.5, 0),
-				new Food(32 * 0.1, 32 * 0.8, 1),
-				new Food(32 * 0.87, 32 * 0.9, 2),
-				new Food(32 * 0.81, 32 * 0.95, 3),
-			]);
-
-			game.initEngines();
-
-			// Render only the first frame, and do not start the game
-			game.runFrame(new Date().getTime());
-		return;
+	try {
+		await summaryDataEvent();
+	} catch (_) {
+		document.getElementById("game").innerHTML +=
+			'<p class="error">No dimensions/measure found on the marks cards</p>';
 	}
+	// Start listening for the Tableau event "SummaryDataChanged".
+	worksheet?.addEventListener(events.SummaryDataChanged, summaryDataEvent);
 
-	tableau.extensions.initializeAsync({ configure }).then(
-		() => {
-			console.log(tableau);
-			tabl.initTableau();
+	// Adding Native Tableau tooltips and highlighting to the marks
+	// in the Scatterplot, but let it feel as native Tableau.
+	scatter.onHoverDatapoint((data, x: number, y: number) => {
+		// first argument is the row index from Tableau starts from 1
+		worksheet
+			?.hoverTupleAsync(data.i + 1, {
+				tooltipAnchorPoint: { x, y },
+			})
+			.catch((error) => console.log("Failed to hover because of: ", error));
+	});
 
-			// game.setSize(32, 32);
-			// game.addSnake(new Snake(2, 5, 3, Direction.UP));
-			//
-			// // set data/food
-			// game.setData([
-			// 	new Food(32 * 0.6, 32 * 0.5, 0),
-			// 	new Food(32 * 0.1, 32 * 0.8, 1),
-			// 	new Food(32 * 0.87, 32 * 0.9, 2),
-			// 	new Food(32 * 0.81, 32 * 0.95, 3),
-			// ]);
+	let selected: number[] = [];
+	scatter.onClickDatapoint(async (data, mouseEvent: MouseEvent) => {
+		console.log("clicked");
+		const ctrlKeyPressed =
+			!!mouseEvent.ctrlKey || !!mouseEvent.shiftKey || mouseEvent.metaKey;
 
-			// must be done before rendering, so the engines are initialized
-			// with the first set of settings/configuration.
-			game.initEngines();
+		const selectOption = ctrlKeyPressed
+			? tableau.SelectOptions.Toggle
+			: tableau.SelectOptions.Simple;
 
-			// Render only the first frame, and do not start the game
-			game.runFrame(new Date().getTime());
-			// // Get the worksheet that the Viz Extension is running in
-			// const worksheet = tableau.extensions.worksheetContent?.worksheet;
-			// console.log(worksheet);
-			// console.log(`The name of the worksheet is ${worksheet.name}`);
+		const tupleId = data.i + 1;
+		selected = scatter.toggleSelection(selected, tupleId, selectOption);
 
-			// actually start the game..
-			// game.start();
-		},
-		(err: Error) => {
-			console.log(err);
-			// Something went wrong in initialization.
-			console.log("Error while Initializing: " + err.toString());
-		},
-	);
+		worksheet
+			.selectTuplesAsync(selected, selectOption, {
+				tooltipAnchorPoint: { x: mouseEvent.pageX, y: mouseEvent.pageY },
+			})
+			.catch((error) => console.log("Failed to select because of: ", error));
+	});
+
+	// Listen for Tableau Filter events
+	worksheet?.addEventListener(events.FilterChanged, summaryDataEvent);
 })(window.tableau);

@@ -1,4 +1,4 @@
-import Game from "../Game";
+import Game from "../libs/Game";
 import { Food, Frame, Renderer } from "../types";
 
 class BrowserRenderer implements Renderer {

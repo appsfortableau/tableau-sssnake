@@ -4,11 +4,11 @@
   font-weight: 400;
 
   --primary-bg: #1a181b;
-  --secondary-text: #5E5A5E;
+  --secondary-text: #5e5a5e;
   --secondary-line: #2a282a;
 
-  --snake: #D90368;
-  --food: #FB8B24;
+  --snake: #d90368;
+  --food: #fb8b24;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -39,6 +39,10 @@ body {
   background-color: var(--primary-bg);
 }
 
+.intro {
+  color: var(--secondary-text);
+}
+
 .playground-d3 {
   aspect-ratio: 1/1;
   width: 90vw;
@@ -59,7 +63,6 @@ body {
         color: var(--secondary-line);
       }
       text {
-
         color: var(--secondary-text);
       }
     }
@@ -71,9 +74,18 @@ body {
       stroke-linecap: round;
     }
   }
+
   .food-group {
     .food {
       position: relative;
+      fill: var(--fill-color);
+      transition: opacity .2s;
+    }
+
+    &.has-selection {
+      & > *:not(.active) {
+        opacity: 0.4;
+      }
     }
   }
 }

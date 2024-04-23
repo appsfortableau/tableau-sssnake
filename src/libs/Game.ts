@@ -1,5 +1,5 @@
 import Snake, { SomeSnake } from "./Snake";
-import { Direction, Food, Frame, GameSize, Path, Renderer } from "./types";
+import { Direction, Food, Frame, GameSize, Path, Renderer } from "../types";
 
 const KEY_SHIFT = "Shift";
 
@@ -158,6 +158,8 @@ export default class Game {
 		if (snake) {
 			snake.dir = frame.direction;
 		}
+
+		console.log(frame)
 
 		this.engines.forEach((engine: Renderer) => engine.render(frame));
 		this.lastFrame = frame;
