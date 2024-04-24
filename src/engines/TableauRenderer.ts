@@ -88,7 +88,6 @@ class TableauRenderer implements Renderer {
 	}
 
 	async queryDataFromWorksheet() {
-		console.log("query data");
 		const dt = await this.worksheet?.getSummaryDataReaderAsync(undefined, {
 			ignoreSelection: true,
 		});
@@ -152,20 +151,13 @@ class TableauRenderer implements Renderer {
 		this.game?.setSize(size, size);
 		this.game?.setData(data);
 
-		console.log(colorIndex !== undefined, Object.keys(colors).length === 1);
+		// add enable option for snake feature when only having 1 category left after filter..
 		if (colorIndex !== undefined && Object.keys(colors).length === 1) {
-			console.log('SNAKEY SNAKEY')
 			this.game?.addSnake(new Snake(2, 5, 3, Direction.UP));
 		}
-
-		// what if we are in a game????
-		// this.game?.runFrame(new Date().getTime());
-		// game mode like:
-		// this.game?.start();
 	}
 
 	init(game: Game) {
-		console.log("init enigne");
 		this.game = game;
 	}
 

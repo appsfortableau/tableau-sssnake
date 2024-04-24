@@ -49,7 +49,6 @@ class Demo {
 	}
 
 	show(): Demo {
-		console.log(this.scatter);
 		// run initial frame directly
 		this.scatter.runFrame(new Date().getTime());
 		return this;
@@ -57,9 +56,9 @@ class Demo {
 
 	async render(): Promise<Demo> {
 		if (!this.scatter.hasInitEngines) {
-			console.log("engines not init");
 			return this;
 		}
+		console.log("[D3] Render Scatterplot");
 		await this.tabl.initData(this.worksheet);
 		return this.show();
 	}

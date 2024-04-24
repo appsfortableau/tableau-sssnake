@@ -312,8 +312,6 @@ class D3Renderer implements Renderer {
 						.classed("active", true);
 				});
 
-				console.log(this.selection);
-
 				this.d3
 					.select(".food-group")
 					.classed("has-selection", this.selection.length > 0);

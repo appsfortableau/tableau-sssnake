@@ -56,7 +56,6 @@ import D3Scatterplot from "./Demo";
 
 	let selected: number[] = [];
 	scatter.onClickDatapoint(async (data, mouseEvent: MouseEvent) => {
-		console.log("clicked");
 		const ctrlKeyPressed =
 			!!mouseEvent.ctrlKey || !!mouseEvent.shiftKey || mouseEvent.metaKey;
 
