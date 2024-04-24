@@ -39,6 +39,15 @@ class D3Renderer implements Renderer {
 	constructor() {
 		this.container = document.getElementById("game");
 	}
+	screenGameStart() {
+
+	}
+	startGame() {
+
+	}
+	stopGame() {
+
+	}
 
 	buildSvg() {
 		// set the dimensions and margins of the graph

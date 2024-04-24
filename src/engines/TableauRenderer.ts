@@ -51,6 +51,10 @@ class TableauRenderer implements Renderer {
 		this.paramMode = await this.worksheet?.findParameterAsync("p_mode");
 		this.paramState = await this.worksheet?.findParameterAsync("p_state");
 
+		this.paramMode?.changeValueAsync(false).then(() => {
+			console.log("[mode] initial!");
+		});
+
 		// this.worksheet?.addEventListener(
 		// 	this.tableau.TableauEventType.SummaryDataChanged,
 		// 	async (e: SummaryDataChangedEvent): Promise<void> => {
@@ -87,6 +91,18 @@ class TableauRenderer implements Renderer {
 		} else {
 			// WE SHOULD SHOW A MESSAGE THAT WE ARE MISSING SOME STUFF...
 		}
+	}
+
+	screenGameStart() {}
+	startGame() {
+		this.paramMode?.changeValueAsync(true).then(() => {
+			console.log("[mode] updated!");
+		});
+	}
+	stopGame() {
+		// this.paramMode?.changeValueAsync(true).then(() => {
+		// 	console.log("[mode] updated!", this.state);
+		// });
 	}
 
 	async queryDataFromWorksheet() {
@@ -185,7 +201,6 @@ class TableauRenderer implements Renderer {
 			?.hoverTupleAsync(food.i + 1, {
 				tooltipAnchorPoint: { x, y },
 			})
-			.then(() => console.log("Done"))
 			.catch((error) => console.log("Failed to hover because of: ", error));
 	}
 

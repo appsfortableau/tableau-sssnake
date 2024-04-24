@@ -97,6 +97,9 @@ export default class Game {
 				this.speed = this.turboSpeed;
 			} else if (e.key === KEY_ESC) {
 				this.running = false;
+				this.engines.forEach(
+					(engine: Renderer) => engine.stopGame && engine.stopGame(),
+				);
 			}
 		});
 	}
@@ -165,6 +168,11 @@ export default class Game {
 		}
 
 		this.running = true;
+
+		this.engines.forEach(
+			(engine: Renderer) => engine.startGame && engine.startGame(),
+		);
+
 		this.start(true);
 	}
 
@@ -309,5 +317,9 @@ export default class Game {
 		if (screen) {
 			screen.style.display = "flex";
 		}
+
+		this.engines.forEach(
+			(engine: Renderer) => engine.screenGameStart && engine.screenGameStart(),
+		);
 	}
 }

@@ -1,11 +1,14 @@
-import Game from "../Game";
-import { SomeSnake } from "../Snake";
+import Game from "../libs/Game";
+import { SomeSnake } from "../libs/Snake";
 
 export interface Renderer {
 	init: (game: Game) => void;
 	render: (frame: Frame) => void;
 	hoverDatapoint: (food: Food, x: number, y: number) => void;
 	hoverOut: (food: Food) => void;
+	screenGameStart: () => void;
+	startGame: () => void;
+	stopGame: () => void;
 }
 
 export type Some<T> = T | undefined;
