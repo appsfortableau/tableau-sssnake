@@ -164,8 +164,8 @@ class D3Renderer implements Renderer {
 					d3
 						.line()
 						.x(([x]) => this.x(x))
-						.y(([_, y]) => this.y(y))
-						.curve(d3.curveNatural),
+						.y(([_, y]) => this.y(y)),
+					// .curve(d3.curveNatural),
 				);
 
 			// console.log(game.snake.eyesRotation(), 'asdfasdf')
@@ -273,13 +273,20 @@ class D3Renderer implements Renderer {
 		// 	.attr("fill", "url(#food-shadow)")
 		// 	.attr("class", "food-shadow");
 
+		const offset = (this.snakeFoodSize / 2) * -1;
 		// Food items
 		food
-			.append("circle")
-			.attr("cx", (food: Food) => this.x(food.x))
-			.attr("cy", (food: Food) => this.y(food.y))
+			.append("rect")
+			.attr("x", (food: Food) => this.x(food.x))
+			.attr("y", (food: Food) => this.y(food.y))
+			.attr("transform", `translate(${offset}, ${offset})`)
+			.attr("width", this.snakeFoodSize)
+			.attr("height", this.snakeFoodSize)
+			// .append("circle")
+			// .attr("cx", (food: Food) => this.x(food.x))
+			// .attr("cy", (food: Food) => this.y(food.y))
 			.attr("id", (food: Food) => `food_${food.x}_${food.y}`)
-			.attr("r", this.snakeFoodSize / FOOD_RATIO)
+			// .attr("r", this.snakeFoodSize / FOOD_RATIO)
 			.attr("class", "food")
 			.attr("style", (food: Food) => `--fill-color: ${food.color}`)
 			// .attr("fill", (food: Food) => food.color)
