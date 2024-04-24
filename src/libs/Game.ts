@@ -2,6 +2,7 @@ import Snake, { SomeSnake } from "./Snake";
 import { Direction, Food, Frame, GameSize, Path, Renderer } from "../types";
 
 const KEY_SHIFT = "Shift";
+const KEY_ESC = "Escape";
 
 const ERR_ENGINES_NOT_STARTED =
 	"Engines are not initialized yet! Please make sure to run the `initEngines` method.";
@@ -10,6 +11,7 @@ export default class Game {
 	hasInitEngines: boolean = false;
 	engines: Renderer[];
 	lastFrame: Frame | undefined;
+	running: boolean = false;
 
 	// score/level vars
 	score: number = 0;
@@ -45,6 +47,7 @@ export default class Game {
 		this.turboSpeed = this.speed / 5;
 
 		this.keymaps();
+		this.interactions();
 	}
 
 	setSize(x: number, y: number): Game {
@@ -89,10 +92,24 @@ export default class Game {
 		});
 
 		window.addEventListener("keydown", (e: KeyboardEvent) => {
+			console.log(e.key);
 			if (e.key === KEY_SHIFT) {
 				this.speed = this.turboSpeed;
+			} else if (e.key === KEY_ESC) {
+				this.running = false;
 			}
 		});
+	}
+
+	interactions() {
+		const screen = document.getElementById("screen-start");
+
+		const button = screen?.querySelector(".screen-modal button");
+		if (button) {
+			button.addEventListener("click", () => {
+				this.startGame();
+			});
+		}
 	}
 
 	initEngines(): Game {
@@ -135,9 +152,20 @@ export default class Game {
 
 		this.tick = timestamp;
 		setTimeout(
-			() => window.requestAnimationFrame(this.gameLoop.bind(this)),
+			() =>
+				this.running && window.requestAnimationFrame(this.gameLoop.bind(this)),
 			this.speed,
 		);
+	}
+
+	startGame() {
+		const screen = document.getElementById("screen-start");
+		if (screen) {
+			screen.style.display = "none";
+		}
+
+		this.running = true;
+		this.start(true);
 	}
 
 	runFrame(timestamp: number) {
@@ -273,6 +301,13 @@ export default class Game {
 				food.push(new Food(x, y, food.length));
 				break;
 			}
+		}
+	}
+
+	screenGameStart() {
+		const screen = document.getElementById("screen-start");
+		if (screen) {
+			screen.style.display = "flex";
 		}
 	}
 }

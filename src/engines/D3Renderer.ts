@@ -114,9 +114,7 @@ class D3Renderer implements Renderer {
 				d3
 					.axisBottom(this.x)
 					.ticks(game.size[0])
-					.tickFormat((y: number): string | null =>
-						y === 0 ? null : `${y}k`,
-					)
+					.tickFormat((y: number): string | null => (y === 0 ? null : `${y}k`))
 					.tickSize(-size),
 			)
 			.selectAll(".tick text")
@@ -130,9 +128,7 @@ class D3Renderer implements Renderer {
 			.call(
 				yAxis
 					.ticks(game.size[1])
-					.tickFormat((x: number): string | null =>
-						x === 0 ? null : `${x}k`,
-					)
+					.tickFormat((x: number): string | null => (x === 0 ? null : `${x}k`))
 					.tickSize(-size),
 				0,
 			)
@@ -213,7 +209,10 @@ class D3Renderer implements Renderer {
 				snake
 					.append("path")
 					.attr("stroke-width", this.snakeFoodSize)
-					.attr("class", "snake-body");
+					.attr("class", "snake-body")
+					.on("click", (e: MouseEvent) => {
+						this.game?.screenGameStart();
+					});
 				snake.append("g").attr("class", "snake-eyes");
 			}
 

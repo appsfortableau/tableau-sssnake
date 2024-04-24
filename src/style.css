@@ -98,6 +98,47 @@ body {
   }
 }
 
+.screen {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  inset:  0;
+  background: radial-gradient(rgba(0,0,0,.8), transparent);
+  .screen-modal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  h1 {
+    font-size: 6rem;
+    color: white;
+    margin: 0;
+    margin-bottom: 3rem;
+  }
+
+  button {
+    background-color: var(--snake);
+    padding: 10px 25px;
+    border: 0;
+    outline: var(--snake) dotted 2px;
+    outline-offset: 2px;
+    font-weight: bolder;
+    transition: all .2s;
+    cursor: pointer;
+    font-size: 2rem;
+    line-height: 3rem;
+    &:hover {
+      outline-offset: 5px;
+      outline-width: 5px;
+      outline-style: solid;
+      font-size: 2.5rem;
+    }
+  }
+}
+
 .playground-browser {
   position: relative;
   border: 5px solid red;

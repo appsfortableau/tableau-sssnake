@@ -30,6 +30,7 @@ class TableauRenderer implements Renderer {
 
 	tableau: Tableau;
 	worksheet: Some<Worksheet>;
+	paramMode: Some<Parameter>;
 	paramState: Some<Parameter>;
 	xField: Some<FieldInstance>;
 	yField: Some<FieldInstance>;
@@ -47,7 +48,8 @@ class TableauRenderer implements Renderer {
 	async initTableau() {
 		// this.worksheet = this.tableau.extensions.worksheetContent?.worksheet;
 
-		this.paramState = await this.worksheet?.findParameterAsync("state");
+		this.paramMode = await this.worksheet?.findParameterAsync("p_mode");
+		this.paramState = await this.worksheet?.findParameterAsync("p_state");
 
 		// this.worksheet?.addEventListener(
 		// 	this.tableau.TableauEventType.SummaryDataChanged,
@@ -165,13 +167,11 @@ class TableauRenderer implements Renderer {
 		const state = this.createState(frame.level, frame.score);
 
 		// only update dashboard parameter if the state was changed.
-		if (state === this.state) {
-			return;
+		if (state !== this.state) {
+			this.paramState?.changeValueAsync(this.state).then(() => {
+				console.log("[state] updated!", this.state);
+			});
 		}
-
-		this.paramState?.changeValueAsync(this.state).then(() => {
-			console.log("[state] updated!", this.state);
-		});
 	}
 
 	createState(...state: (string | number)[]): string {
