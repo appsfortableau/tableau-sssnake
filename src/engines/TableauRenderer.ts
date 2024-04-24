@@ -121,8 +121,8 @@ class TableauRenderer implements Renderer {
 
 		// Fixed data setup
 		const data = dataTable.data.map((row: DataValue[], index: number) => {
-			const x = row[axisXIndex].nativeValue;
-			const y = row[axisYIndex].nativeValue;
+			const x = Math.round(row[axisXIndex].nativeValue / 1000);
+			const y = Math.round(row[axisYIndex].nativeValue / 1000);
 
 			if (x > maxX) maxX = x;
 			if (y > maxY) maxY = y;

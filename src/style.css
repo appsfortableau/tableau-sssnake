@@ -42,6 +42,7 @@ body {
 
 .intro {
   color: var(--secondary-text);
+  margin: 0;
 }
 
 .playground-d3 {
@@ -51,6 +52,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
 
   .error {
     color: #af0000;

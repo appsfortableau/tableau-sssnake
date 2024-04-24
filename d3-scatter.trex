@@ -3,7 +3,7 @@
   <worksheet-extension id="com.appsfortableau.extensions.super-tables" extension-version="1.0.0">
     <default-locale>en_US</default-locale>
     <name resource-id="name" />
-    <description>SSSNake</description> <author name="Infotopics | Apps for Tableau" email="support@appsfortableau.infotopics.com"
+    <description>D3 Scatter tutorial</description> <author name="Infotopics | Apps for Tableau" email="support@appsfortableau.infotopics.com"
       organization="Infotopics | Apps for Tableau" website="https://appsfortableau.infotopics.com" />
     <min-api-version>1.11</min-api-version>
     <source-location>

@@ -114,6 +114,9 @@ class D3Renderer implements Renderer {
 				d3
 					.axisBottom(this.x)
 					.ticks(game.size[0])
+					.tickFormat((y: number): string | null =>
+						y === 0 ? null : `${y}k`,
+					)
 					.tickSize(-size),
 			)
 			.selectAll(".tick text")
@@ -128,7 +131,7 @@ class D3Renderer implements Renderer {
 				yAxis
 					.ticks(game.size[1])
 					.tickFormat((x: number): string | null =>
-						x === 0 ? null : x.toString(),
+						x === 0 ? null : `${x}k`,
 					)
 					.tickSize(-size),
 				0,
