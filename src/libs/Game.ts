@@ -32,6 +32,7 @@ export default class Game {
 	snake: SomeSnake = undefined;
 	// where is the current food located
 	food: Food[] = [];
+	backupFood: Food[] = [];
 
 	constructor(
 		engine: Renderer[],
@@ -63,6 +64,7 @@ export default class Game {
 
 	keymaps() {
 		window.addEventListener("keyup", (e: KeyboardEvent) => {
+			e.preventDefault();
 			if (e.key === KEY_SHIFT) {
 				this.speed = this.normalSpeed;
 				return;
@@ -95,6 +97,7 @@ export default class Game {
 			if (e.key === KEY_SHIFT) {
 				this.speed = this.turboSpeed;
 			} else if (e.key === KEY_ESC) {
+				this.screenGameStart();
 				this.running = false;
 				this.engines.forEach(
 					(engine: Renderer) => engine.stopGame && engine.stopGame(),
@@ -106,12 +109,33 @@ export default class Game {
 	interactions() {
 		const screen = document.getElementById("screen-start");
 
-		const button = screen?.querySelector(".screen-modal button");
-		if (button) {
-			button.addEventListener("click", () => {
-				this.startGame();
-			});
-		}
+		screen.addEventListener("click", (e) => {
+			e.preventDefault();
+
+			// clicking within the screen-start and not on a button
+			const mode = e.target.getAttribute("data-mode");
+			if (!mode) {
+				return;
+			}
+
+			if (this.backupFood.length === 0) {
+				this.backupFood = this.food;
+			}
+
+			if (mode === "restart") {
+				this.score = 0;
+				this.level = 0;
+				this.eaten = 0;
+				this.dir = Direction.UP;
+				this.tick = 0;
+				this.normalSpeed = 750;
+				this.turboSpeed = 750 / 5;
+				this.setData(this.backupFood);
+				this.addSnake(new Snake(2, 5, 3, Direction.UP));
+			}
+
+			this.startGame();
+		});
 	}
 
 	initEngines(): Game {
@@ -314,6 +338,21 @@ export default class Game {
 		const screen = document.getElementById("screen-start");
 		if (screen) {
 			screen.style.display = "flex";
+		}
+
+		screen
+			?.querySelectorAll(".screen-form")
+			.forEach((elm) => (elm.style.display = "none"));
+
+		let modal = null;
+		if (this.score > 0) {
+			modal = screen?.querySelector(".continue-game");
+		} else {
+			modal = screen?.querySelector(".new-game");
+		}
+
+		if (modal) {
+			modal.style.display = "flex";
 		}
 
 		this.engines.forEach(

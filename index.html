@@ -13,9 +13,21 @@
     </div>
 
     <div id="screen-start" class="screen" style="display: none">
-      <div class="screen-modal">
+      <div class="screen-form new-game" style="display: none">
         <h1>Game unlocked!</h1>
-        <button>START GAME</button>
+        <button class="btn btn-primary" data-mode="restart">START GAME</button>
+      </div>
+
+      <div class="screen-form continue-game" style="display: none">
+        <h1>HUNGRY SNAKE</h1>
+        <div class="group">
+          <button class="btn btn-primary" data-mode="continue">
+            CONTINUE GAME
+          </button>
+          <button class="btn btn-secondary" data-mode="restart">
+            RESTART GAME
+          </button>
+        </div>
       </div>
     </div>
     <script type="module" src="/src/main.ts"></script>
