@@ -309,7 +309,6 @@ export default class Game {
 			const food = this.food[i];
 
 			if (food.x === head[0] && food.y === head[1]) {
-				console.log("YUMMIIII");
 				return [true, food, parseInt(i)];
 			}
 		}

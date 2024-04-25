@@ -48,7 +48,7 @@ class TableauRenderer implements Renderer {
     this.paramState = await this.worksheet?.findParameterAsync('p_state');
 
     this.paramMode?.changeValueAsync(false).then(() => {
-      console.log('[mode] initial!');
+      // console.log('[mode] initial!');
     });
 
     // this.worksheet?.addEventListener(
@@ -93,7 +93,7 @@ class TableauRenderer implements Renderer {
   screenGameStart() {}
   startGame() {
     this.paramMode?.changeValueAsync(true).then(() => {
-      console.log('[mode] updated!');
+      // console.log('[mode] updated!');
     });
   }
   stopGame() {

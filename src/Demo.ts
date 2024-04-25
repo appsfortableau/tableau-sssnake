@@ -32,7 +32,7 @@ class Demo {
   }
 
   async _initialize(): Promise<Demo> {
-    console.log('[D3] Initialize Scatterplot', this.worksheet);
+    // console.log('[D3] Initialize Scatterplot', this.worksheet);
     // must be done before rendering, so the engines are initialized
     // with the first set of settings/configuration.
     this.scatter.initEngines();
@@ -50,7 +50,7 @@ class Demo {
     if (!this.scatter.hasInitEngines) {
       return this;
     }
-    console.log('[D3] Render Scatterplot', this.worksheet);
+    // console.log('[D3] Render Scatterplot', this.worksheet);
     await this.tabl.initData(this.worksheet);
     return this.show();
   }

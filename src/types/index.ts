@@ -43,7 +43,7 @@ export class Frame {
 	speedMultuplier: number = 1;
 
 	constructor(timestamp: number, snake: SomeSnake, food: Food[]) {
-		console.log("[D3] Frame timestamp:", timestamp);
+		// console.log("[D3] Frame timestamp:", timestamp);
 		this.snake = snake;
 		this.food = food;
 	}
