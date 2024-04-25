@@ -9,19 +9,16 @@ const scatter = new D3Scatterplot();
 
   // 1. Initliaze the Tableau Extensions API
   await tableau.extensions.initializeAsync();
+
+  // 2. Get the data from the worksheet
   const worksheet = tableau.extensions.worksheetContent?.worksheet;
 
   // Fetch the data from the worksheet.
   async function getDataFromWorksheet() {
-    console.log('[Tableau] Fetching data...');
-
     // Boilerplate: Connect with Tableau via Extensions API and fetch a summary of data.
     const dataTableReader = await worksheet!.getSummaryDataReaderAsync();
     const dataTable = await dataTableReader.getAllPagesAsync();
     await dataTableReader.releaseAsync();
-
-    console.log('[Tableau] Columns:', dataTable.columns.map((t: Column) => t.fieldName).join(', '));
-    console.log('[Tableau] Total rows found:', dataTable.totalRowCount);
 
     // 3. Render the Scatterplot
     // give the function the worksheet to handle columns
@@ -29,11 +26,10 @@ const scatter = new D3Scatterplot();
     await scatter.render();
   }
 
-  // 2. Get the data from the worksheet
   try {
     await getDataFromWorksheet();
   } catch (_) {
-    document.getElementById('scatter-plot').innerHTML +=
+    document.getElementById('scatter-plot')!.innerHTML +=
       '<p class="error">No dimensions/measure found on the marks cards</p>';
   }
 
@@ -46,34 +42,30 @@ const scatter = new D3Scatterplot();
   worksheet?.addEventListener(events.FilterChanged, getDataFromWorksheet);
 
   // 5. Add Tableau Native tooltips
-
-  // Adding Native Tableau tooltips and highlighting to the marks
-  // in the Scatterplot, but let it feel as native Tableau.
-  scatter.onHoverDatapoint((data, x: number, y: number) => {
+  scatter.onHoverDatapoint((data, mouseX: number, mouseY: number) => {
     // first argument is the row index from Tableau starts from 1
+    const tupleId = data.i + 1;
     worksheet
-      ?.hoverTupleAsync(data.i + 1, {
-        tooltipAnchorPoint: { x, y },
+      ?.hoverTupleAsync(tupleId, {
+        tooltipAnchorPoint: { x: mouseX, y: mouseY },
       })
-      .catch((error) => console.log('Failed to hover because of: ', error));
+      .catch((error) => console.error('Failed to hover because of: ', error));
   });
 
   // 6. Add highlighting to the marks
-
-  let selected: number[] = [];
+  let selectedTupleIds: number[] = [];
   scatter.onClickDatapoint(async (data, mouseEvent: MouseEvent) => {
     const ctrlKeyPressed = !!mouseEvent.ctrlKey || !!mouseEvent.shiftKey || mouseEvent.metaKey;
-
     const selectOption = ctrlKeyPressed ? tableau.SelectOptions.Toggle : tableau.SelectOptions.Simple;
 
     const tupleId = data.i + 1;
-    selected = scatter.toggleSelection(selected, tupleId, selectOption);
+    selectedTupleIds = scatter.toggleSelection(selectedTupleIds, tupleId, selectOption);
 
     worksheet!
-      .selectTuplesAsync(selected, selectOption, {
+      .selectTuplesAsync(selectedTupleIds, selectOption, {
         tooltipAnchorPoint: { x: mouseEvent.pageX, y: mouseEvent.pageY },
       })
-      .catch((error) => console.log('Failed to select because of: ', error));
+      .catch((error) => console.error('Failed to select because of: ', error));
   });
 })(window.tableau);
 
