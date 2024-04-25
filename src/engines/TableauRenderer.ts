@@ -3,12 +3,10 @@ import Snake from "../libs/Snake";
 import { Food, Frame, Renderer, Some, Direction } from "../types";
 import {
 	Column,
-	DataTable,
 	DataValue,
 	Encoding,
 	FieldInstance,
 	Parameter,
-	SummaryDataChangedEvent,
 	Tableau,
 	Worksheet,
 } from "../types/extensions-api-types";
@@ -180,17 +178,21 @@ class TableauRenderer implements Renderer {
 	}
 
 	render(frame: Frame) {
-		const state = this.createState(frame.level, frame.score);
+		const score = `0000${frame.score}`;
+		const state = this.createState(
+			`0${frame.level}`,
+			score.substring(score.length - 4),
+		);
 
 		// only update dashboard parameter if the state was changed.
 		if (state !== this.state) {
-			this.paramState?.changeValueAsync(this.state).then(() => {
-				console.log("[state] updated!", this.state);
+			this.paramState?.changeValueAsync(state).then(() => {
+				console.log("[Tableau] updated!", state);
 			});
 		}
 	}
 
-	createState(...state: (string | number)[]): string {
+	createState(...state: string[]): string {
 		return state.join(this.seperator);
 	}
 
