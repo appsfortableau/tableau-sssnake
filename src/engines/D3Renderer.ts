@@ -2,7 +2,7 @@ import Game from '../libs/Game';
 import * as d3 from 'd3';
 import { Food, Frame, Renderer } from '../types';
 import { EyeElm } from '../libs/Snake';
-import { HoverDatapointCallback, ClickDatapointCallback } from '../Demo';
+import { HoverDatapointCallback, ClickDatapointCallback } from '../ScatterPlot';
 
 type D3Selecion = d3.Selection<SVGSVGElement, unknown, HTMLElement, any>;
 type D3Selected = d3.Selection<d3.BaseType, Food, d3.BaseType, unknown>;

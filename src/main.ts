@@ -1,7 +1,7 @@
 import './style.css';
 
 // our D3 Scatterplot builder.
-import D3Scatterplot from './Demo';
+import D3Scatterplot from './ScatterPlot';
 const scatter = new D3Scatterplot();
 
 (async (tableau: Tableau) => {
