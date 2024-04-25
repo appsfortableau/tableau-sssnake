@@ -92,7 +92,6 @@ export default class Game {
 		});
 
 		window.addEventListener("keydown", (e: KeyboardEvent) => {
-			console.log(e.key);
 			if (e.key === KEY_SHIFT) {
 				this.speed = this.turboSpeed;
 			} else if (e.key === KEY_ESC) {
@@ -238,7 +237,6 @@ export default class Game {
 			this.level = Math.round(this.eaten / this.foodPerLevel) + 1;
 			this.score += (this.eaten / this.foodPerLevel) * this.pointsPerFood;
 			// Increase speed when levelup, min on 10ms per level
-			console.log("Speed increase", 10 * (this.level - 1) * 0.75);
 
 			this.speed = this.normalSpeed - 10 * (this.level - 1) * 0.75;
 			this.turboSpeed = this.speed / 5;
