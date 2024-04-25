@@ -40,6 +40,11 @@ body {
   background-color: var(--primary-bg);
 }
 
+#game {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
 .intro {
   color: var(--secondary-text);
   margin: 0;
@@ -87,7 +92,7 @@ body {
     .food {
       position: relative;
       fill: var(--fill-color);
-      transition: opacity .2s;
+      transition: opacity 0.2s;
     }
 
     &.has-selection {
@@ -103,8 +108,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  inset:  0;
-  background: radial-gradient(rgba(0,0,0,.8), transparent);
+  inset: 0;
+  background: radial-gradient(rgba(0, 0, 0, 0.8), transparent);
   .screen-form {
     display: flex;
     flex-direction: column;
@@ -133,7 +138,7 @@ body {
     outline-style: dotted;
     outline-offset: 2px;
     font-weight: bolder;
-    transition: all .2s;
+    transition: all 0.2s;
     cursor: pointer;
     font-size: 2rem;
     line-height: 3rem;

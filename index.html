@@ -1,35 +1,61 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SSSNake</title>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="/vite.svg" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0" />
+    <title>SSScatterplot</title>
     <script src="/tableau.extensions.1.latest.min.js"></script>
   </head>
+
   <body>
-    <div id="game" class="playground-d3">
+    <div
+      id="game"
+      class="playground-d3">
       <h1 class="intro">Hello, TC 2024!</h1>
     </div>
 
-    <div id="screen-start" class="screen" style="display: none">
-      <div class="screen-form new-game" style="display: none">
+    <!-- MARK: Need to remove this -->
+    <div
+      id="screen-start"
+      class="screen"
+      style="display: none">
+      <div
+        class="screen-form new-game"
+        style="display: none">
         <h1>Game unlocked!</h1>
-        <button class="btn btn-primary" data-mode="restart">START GAME</button>
+        <button
+          class="btn btn-primary"
+          data-mode="restart">
+          START GAME
+        </button>
       </div>
 
-      <div class="screen-form continue-game" style="display: none">
+      <div
+        class="screen-form continue-game"
+        style="display: none">
         <h1>HUNGRY SNAKE</h1>
         <div class="group">
-          <button class="btn btn-primary" data-mode="continue">
+          <button
+            class="btn btn-primary"
+            data-mode="continue">
             CONTINUE GAME
           </button>
-          <button class="btn btn-secondary" data-mode="restart">
+          <button
+            class="btn btn-secondary"
+            data-mode="restart">
             RESTART GAME
           </button>
         </div>
       </div>
     </div>
-    <script type="module" src="/src/main.ts"></script>
+    <script
+      type="module"
+      src="/src/main.ts"></script>
   </body>
 </html>
