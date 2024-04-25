@@ -9,12 +9,11 @@ const scatter = new D3Scatterplot();
 
   // 1. Initliaze the Tableau Extensions API
   await tableau.extensions.initializeAsync();
-
   const worksheet = tableau.extensions.worksheetContent?.worksheet;
 
   // Fetch the data from the worksheet.
   async function getDataFromWorksheet() {
-    console.log('[Tableau] Fetching data...', worksheet);
+    console.log('[Tableau] Fetching data...');
 
     // Boilerplate: Connect with Tableau via Extensions API and fetch a summary of data.
     const dataTableReader = await worksheet!.getSummaryDataReaderAsync();
@@ -34,7 +33,8 @@ const scatter = new D3Scatterplot();
   try {
     await getDataFromWorksheet();
   } catch (_) {
-    document.getElementById('game').innerHTML += '<p class="error">No dimensions/measure found on the marks cards</p>';
+    document.getElementById('scatter-plot').innerHTML +=
+      '<p class="error">No dimensions/measure found on the marks cards</p>';
   }
 
   // 4. Listen for Tableau events

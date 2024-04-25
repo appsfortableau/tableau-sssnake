@@ -40,9 +40,10 @@ body {
   background-color: var(--primary-bg);
 }
 
-#game {
-  font-size: 2rem;
+#scatter-plot {
+  font-size: 4rem;
   font-weight: bold;
+  color: var(--secondary-text);
 }
 
 .intro {
