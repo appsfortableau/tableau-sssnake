@@ -103,13 +103,11 @@ class TableauRenderer implements Renderer {
   }
 
   async queryDataFromWorksheet() {
-    console.log('this.worksheet', this.worksheet);
-
     const dt = await this.worksheet?.getSummaryDataReaderAsync(undefined, {
       ignoreSelection: true,
     });
     if (!dt) {
-      console.log('WE ARE FAILURES');
+      // console.log('WE ARE FAILURES');
       return;
     }
 
@@ -177,7 +175,7 @@ class TableauRenderer implements Renderer {
     // only update dashboard parameter if the state was changed.
     if (state !== this.state) {
       this.paramState?.changeValueAsync(state).then(() => {
-        console.log('[Tableau] updated!', state);
+        // console.log('[Tableau] updated!', state);
       });
     }
   }
@@ -193,7 +191,7 @@ class TableauRenderer implements Renderer {
       ?.hoverTupleAsync(food.i + 1, {
         tooltipAnchorPoint: { x, y },
       })
-      .catch((error) => console.log('Failed to hover because of: ', error));
+      .catch((error) => console.error('Failed to hover because of: ', error));
   }
 
   hoverOut(_: Food) {
