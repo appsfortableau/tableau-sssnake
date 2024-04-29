@@ -124,7 +124,7 @@ export default class Game {
 
 			if (mode === "restart") {
 				this.score = 0;
-				this.level = 0;
+				this.level = 1;
 				this.eaten = 0;
 				this.dir = Direction.UP;
 				this.tick = 0;
