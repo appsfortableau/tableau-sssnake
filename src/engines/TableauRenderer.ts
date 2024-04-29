@@ -103,11 +103,12 @@ class TableauRenderer implements Renderer {
   }
 
   async queryDataFromWorksheet() {
-    const dt = await this.worksheet?.getSummaryDataReaderAsync(undefined, {
-      ignoreSelection: true,
-    });
-    if (!dt) {
-      // console.log('WE ARE FAILURES');
+    let dt;
+    try {
+      dt = await this.worksheet?.getSummaryDataReaderAsync(undefined, {
+        ignoreSelection: true,
+      });
+    } catch (error) {
       return;
     }
 
