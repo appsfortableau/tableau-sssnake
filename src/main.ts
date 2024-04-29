@@ -1,3 +1,4 @@
+// @ts-nocheck
 import './style.css';
 
 // our D3 Scatterplot builder.
