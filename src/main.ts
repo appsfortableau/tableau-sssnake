@@ -2,13 +2,14 @@ import './style.css';
 
 // our D3 Scatterplot builder.
 import D3Scatterplot from './ScatterPlot';
-const scatter = new D3Scatterplot();
 
 (async (tableau: Tableau) => {
   console.log('Web app is running');
 
   // 1. Initliaze the Tableau Extensions API
   // await tableau.extensions.initializeAsync();
+
+  const scatter = new D3Scatterplot();
 
   // 2. Get the data from the worksheet
   // const worksheet = tableau.extensions.worksheetContent?.worksheet;
@@ -43,9 +44,9 @@ const scatter = new D3Scatterplot();
   // 5. Add Tableau Native tooltips
   // scatter.onHoverDatapoint((data, mouseX: number, mouseY: number) => {
   //   // first argument is the row index from Tableau starts from 1
-  //   const markId = data.i + 1;
+  //   const hoveredMarkRowIndex = data.i + 1;
   //   worksheet
-  //     ?.hoverTupleAsync(markId, {
+  //     ?.hoverTupleAsync(hoveredMarkRowIndex, {
   //       tooltipAnchorPoint: { x: mouseX, y: mouseY },
   //     })
   //     .catch((error) => console.error('Failed to hover because of: ', error));
