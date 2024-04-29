@@ -9,7 +9,7 @@ import D3Scatterplot from './ScatterPlot';
   // 1. Initliaze the Tableau Extensions API
   // await tableau.extensions.initializeAsync();
 
-  const scatter = new D3Scatterplot();
+  // const scatter = new D3Scatterplot();
 
   // 2. Get the data from the worksheet
   // const worksheet = tableau.extensions.worksheetContent?.worksheet;
